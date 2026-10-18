@@ -1,6 +1,6 @@
-# StitchLab 🧵
+# PixeLinha 🧵
 
-> **Nome provisório.** Aplicação web que transforma uma imagem em gráficos de bordado, começando pelo **ponto cruz**.
+> Aplicação web que transforma uma imagem em gráficos de bordado, começando pelo **ponto cruz**.
 
 **Status:** 📝 Planejamento · **Versão do documento:** 0.1
 
@@ -106,7 +106,7 @@ O processamento de imagem roda **no servidor** (Python), e o front-end (React) m
 - **Manutenibilidade:** um módulo por tipo de ponto, com testes na parte de processamento.
 - **Custo:** R$ 0 de infraestrutura na v1.
 
-> **Limites padrão** (configuráveis por variáveis de ambiente `STITCHLAB_*`, por exemplo `STITCHLAB_MAX_GRID_WIDTH=400`): upload de até 10 MB; grade de 10 a 300 pontos de largura; de 1 a 40 cores; até 90 mil pontos no total. A ideia é não frustrar quem usa fotos de celular e gráficos grandes, sem deixar o servidor gratuito sobrecarregado.
+> **Limites padrão** (configuráveis por variáveis de ambiente `PIXELINHA_*`, por exemplo `PIXELINHA_MAX_GRID_WIDTH=400`): upload de até 10 MB; grade de 10 a 300 pontos de largura; de 1 a 40 cores; até 90 mil pontos no total. A ideia é não frustrar quem usa fotos de celular e gráficos grandes, sem deixar o servidor gratuito sobrecarregado.
 
 ## 6. Arquitetura e stack
 
@@ -221,7 +221,7 @@ Erros extras desse recurso (`422`): `nothing_to_stitch` (só sobrou fundo) e `ba
 Monorepo, com a lógica de cada ponto isolada em um módulo.
 
 ```
-stitchlab/
+pixelinha/
 ├── README.md
 ├── frontend/
 │   ├── src/
@@ -281,9 +281,9 @@ stitchlab/
 
 ### Fase 4: PDF e deploy (~2 dias)
 - [x] Geração do PDF (grade paginada + legenda), com tecido, tamanho em cm e novelos
-- [ ] Dockerfile e deploy da API no Hugging Face Space
-- [ ] Deploy do front na Vercel
-- [ ] Variáveis de ambiente e CORS
+- [x] Dockerfile, CORS por variável de ambiente e automação do deploy da API (GitHub Actions → Hugging Face Space)
+- [ ] API no ar no Hugging Face Space
+- [ ] Front no ar na Vercel
 - [ ] Teste de ponta a ponta em produção
 
 ### Fase 5: Acabamento (~1–2 dias)
@@ -306,6 +306,24 @@ stitchlab/
 - Configurar CORS apenas para o domínio do front.
 - Nunca commitar chaves: usar variáveis de ambiente (`SUPABASE_URL`, `SUPABASE_KEY`, etc.).
 - Limites e regras de planos gratuitos mudam, então conferir na hora do deploy.
+
+### Como publicar (passo a passo)
+
+**1. API no Hugging Face (automático)**
+1. Crie uma conta em huggingface.co e, em *Settings → Access Tokens*, um token do tipo *Write*.
+2. No GitHub, em *Settings → Secrets and variables → Actions → New repository secret*, crie o segredo `HF_TOKEN` com esse token. Nunca cole o token em arquivos nem em conversas.
+3. Em *Actions → Deploy backend → Run workflow*. O script `.github/scripts/deploy_space.py` cria o Space `seu-usuario/pixelinha-api` (se não existir), define o CORS e envia a pasta `backend/`. Depois de alguns minutos de build, a API responde em `https://seu-usuario-pixelinha-api.hf.space/api/v1/health`.
+4. A partir daí, todo push em `main` que mexer em `backend/` publica de novo.
+
+Variáveis opcionais (aba *Variables*): `HF_SPACE` (outro nome de Space), `ALLOWED_ORIGINS` (sites extras, separados por vírgula) e `ALLOWED_ORIGIN_REGEX` (padrão: endereços `pixelinha*.vercel.app`).
+
+**2. Front na Vercel**
+1. Em vercel.com, *Add New → Project* e importe este repositório.
+2. Em *Root Directory*, escolha `frontend`.
+3. Em *Environment Variables*, crie `VITE_API_URL` com o endereço da API (passo 3 acima, sem a barra final) e faça o deploy.
+
+**3. Manter a API acordada (opcional)**
+Crie a variável `API_URL` no GitHub (o mesmo endereço da API). O workflow `keepalive.yml` chama `/api/v1/health` todo dia e evita que o Space durma.
 
 ## 14. Testes e qualidade
 
@@ -336,7 +354,7 @@ stitchlab/
 | Imagens grandes travando o servidor | Limites de tamanho e de grade, mais timeout |
 | Armazenamento limitado no plano gratuito | Limitar o tamanho das imagens e apagar arquivos órfãos |
 
-**Decisões em aberto:** nome definitivo do projeto e conjunto final de símbolos. Decidido por enquanto: visitantes **podem** baixar o PDF sem login (se isso mudar, é só proteger a rota). A identidade visual é a paleta Petal Dream.
+**Decisões em aberto:** conjunto final de símbolos. Nome definido: PixeLinha. Decidido por enquanto: visitantes **podem** baixar o PDF sem login (se isso mudar, é só proteger a rota). A identidade visual é a paleta Petal Dream.
 
 ## 17. Pós-MVP
 
@@ -354,7 +372,7 @@ Cada novo ponto vira um módulo em `backend/app/modes/` e uma opção no seletor
 Sem instalar nada: o repositório tem uma configuração para o **GitHub Codespaces** (um computador temporário na nuvem, grátis dentro da cota mensal da conta pessoal).
 
 1. No repositório no GitHub, clique em **Code** → aba **Codespaces** → **Create codespace on main**.
-2. Espere a instalação (alguns minutos na primeira vez). Quando terminar, o app abre numa aba do navegador. Se não abrir, vá na aba **Ports** do editor e clique no globo ao lado de **StitchLab**.
+2. Espere a instalação (alguns minutos na primeira vez). Quando terminar, o app abre numa aba do navegador. Se não abrir, vá na aba **Ports** do editor e clique no globo ao lado de **PixeLinha**.
 3. Para reabrir depois, volte em **Code** → **Codespaces** e escolha o existente. Os servidores sobem sozinhos.
 
 O Codespace para sozinho após um tempo parado; para apagar, use a lista em github.com/codespaces.
@@ -371,7 +389,7 @@ Para rodar na própria máquina, veja `backend/` (FastAPI) e `frontend/README.md
 
 ## 18. English summary
 
-**StitchLab** (working title) is a full-stack web app that converts an uploaded image into embroidery charts, starting with **cross-stitch**. The user picks a grid size and number of colors, and the app returns a symbol chart, a thread legend matched to the **DMC** catalog (with stitch counts), and a printable **PDF**.
+**PixeLinha** is a full-stack web app that converts an uploaded image into embroidery charts, starting with **cross-stitch**. The user picks a grid size and number of colors, and the app returns a symbol chart, a thread legend matched to the **DMC** catalog (with stitch counts), and a printable **PDF**.
 
 **Stack:** React + Vite (Vercel) · Python/FastAPI with OpenCV, Pillow, scikit-learn and ReportLab (Hugging Face Spaces, Docker) · Supabase for auth, PostgreSQL and storage. The whole setup runs on free tiers.
 

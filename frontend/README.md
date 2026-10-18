@@ -1,4 +1,4 @@
-# StitchLab: front-end
+# PixeLinha: front-end
 
 React 19 + Vite. The chart editor: upload an image, adjust size and colors,
 and see the cross-stitch chart with its DMC thread legend.

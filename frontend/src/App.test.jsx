@@ -67,7 +67,7 @@ describe('App', () => {
   it('shows the name of the product', async () => {
     render(<App />)
 
-    expect(screen.getByRole('heading', { name: 'StitchLab' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'PixeLinha' })).toBeInTheDocument()
     await screen.findByRole('slider', { name: 'Largura' })
   })
 
