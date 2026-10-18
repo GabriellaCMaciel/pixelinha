@@ -1,22 +1,11 @@
----
-title: PixeLinha API
-emoji: 🌸
-colorFrom: pink
-colorTo: yellow
-sdk: docker
-app_port: 7860
-pinned: false
-short_description: Turns images into cross-stitch charts and printable PDFs.
----
-
 # PixeLinha: API
 
 FastAPI service that turns an image into a cross-stitch chart (DMC threads,
 symbols, stitch counts, size and skeins) and into a printable PDF.
 
 The front-end lives in the same repository: <https://github.com/GabriellaCMaciel/pixelinha>.
-The header above is the configuration Hugging Face Spaces reads when this folder
-is deployed as a Docker Space.
+`Dockerfile` builds the image; the port comes from the `PORT` variable (10000 by default).
+`render.yaml` at the repository root deploys it to Render's free plan.
 
 ## Running
 
