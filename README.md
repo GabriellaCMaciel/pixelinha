@@ -237,7 +237,7 @@ stitchlab/
 - [x] Projeto base do FastAPI com `/health`
 - [x] Projeto base do React (Vite)
 - [ ] Criar projeto no Supabase
-- [ ] Obter e organizar a tabela DMC (conferir a licença da fonte)
+- [x] Obter e organizar a tabela DMC (conferir a licença da fonte)
 
 ### Fase 1: Motor do ponto cruz (~2–3 dias)
 - [ ] Redimensionar mantendo a proporção
@@ -313,7 +313,7 @@ stitchlab/
 |----------------|-----------|
 | Resultado "sujo" em fotos complexas | Oferecer suavização e limite de cores; sugerir imagens simples nos exemplos |
 | API dormindo na hospedagem gratuita | Aviso no front; medir o tempo real de despertar |
-| Fonte e licença da tabela DMC | Conferir a licença da fonte e creditar no README |
+| Licença da tabela DMC | Resolvido: dados sob CC BY 4.0, com crédito na seção "Créditos" |
 | Imagens grandes travando o servidor | Limites de tamanho e de grade, mais timeout |
 | Armazenamento limitado no plano gratuito | Limitar o tamanho das imagens e apagar arquivos órfãos |
 
@@ -329,6 +329,11 @@ Cada novo ponto vira um módulo em `backend/app/modes/` e uma opção no seletor
 4. **Ponto cheio (cetim):** divisão em regiões de cor com direção do fio. É o mais complexo.
 5. **Edição manual** da grade, outros catálogos de linha e compartilhamento de projetos.
 6. **Recursos com IA** (segunda fase do projeto): sugestão automática de parâmetros, melhoria de imagens e remoção de fundo.
+
+## Créditos
+
+- **Cores DMC:** Color data: craft-color-codes by [MakeBead](https://makebead.com), licenciado sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Mais detalhes em `backend/app/data/README.md`.
+- DMC é uma marca registrada de seu titular. Este projeto não é afiliado nem endossado pela DMC.
 
 ---
 
