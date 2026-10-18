@@ -17,7 +17,7 @@ class Settings:
     max_image_pixels: int = 40_000_000
     min_grid_width: int = 10
     max_grid_width: int = 300
-    min_colors: int = 2
+    min_colors: int = 1
     max_colors: int = 40
     max_stitches: int = 90_000
 
