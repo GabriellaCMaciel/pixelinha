@@ -66,6 +66,20 @@ def grid_size(width: int, height: int, grid_width: int) -> tuple[int, int]:
     return grid_width, grid_height
 
 
+def largest_grid_width(width: int, height: int, max_stitches: int) -> int:
+    """Largest grid width whose chart stays within `max_stitches` for this image."""
+    if width < 1 or height < 1 or max_stitches < 1:
+        raise ValueError("Dimensions and the stitch limit must be positive.")
+
+    candidate = max(1, int((max_stitches * width / height) ** 0.5) + 2)
+    while candidate > 1:
+        grid_width, grid_height = grid_size(width, height, candidate)
+        if grid_width * grid_height <= max_stitches:
+            break
+        candidate -= 1
+    return candidate
+
+
 def resize_to_grid(image: np.ndarray, grid_width: int) -> np.ndarray:
     """Resize an RGB image (H x W x 3, uint8) to the stitch grid.
 
