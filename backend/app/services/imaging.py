@@ -1,5 +1,55 @@
+import io
+
 import cv2
 import numpy as np
+from PIL import Image, ImageOps, UnidentifiedImageError
+
+ALLOWED_FORMATS = frozenset({"PNG", "JPEG", "WEBP"})
+
+
+class ImageDecodeError(ValueError):
+    """The uploaded bytes could not be turned into a usable image."""
+
+
+class UnsupportedImageFormat(ImageDecodeError):
+    """The upload is not a PNG, JPEG or WEBP image."""
+
+
+class ImageTooLarge(ImageDecodeError):
+    """The image has more pixels than the service accepts."""
+
+
+def decode_image(data: bytes, max_pixels: int) -> np.ndarray:
+    """Decode an uploaded PNG, JPEG or WEBP into an RGB array (H x W x 3, uint8).
+
+    The photo is turned upright using its EXIF orientation, and transparent areas
+    are placed over a white background. The size is checked from the file header
+    before the pixels are read, so a huge image cannot exhaust memory.
+    """
+    try:
+        image = Image.open(io.BytesIO(data))
+    except (UnidentifiedImageError, OSError):
+        raise UnsupportedImageFormat("The file is not a valid image.") from None
+
+    if image.format not in ALLOWED_FORMATS:
+        raise UnsupportedImageFormat("Only PNG, JPEG and WEBP images are supported.")
+
+    width, height = image.size
+    if width * height > max_pixels:
+        raise ImageTooLarge(
+            f"The image has {width * height:,} pixels; the limit is {max_pixels:,}."
+        )
+
+    try:
+        image.load()
+        image = ImageOps.exif_transpose(image)
+        image = image.convert("RGBA")
+        background = Image.new("RGBA", image.size, (255, 255, 255, 255))
+        rgb = Image.alpha_composite(background, image).convert("RGB")
+    except (OSError, SyntaxError, ValueError):
+        raise ImageDecodeError("The image file is corrupted or incomplete.") from None
+
+    return np.asarray(rgb, dtype=np.uint8)
 
 
 def grid_size(width: int, height: int, grid_width: int) -> tuple[int, int]:
