@@ -1,0 +1,65 @@
+import { textColorFor } from '../lib/chartRender.js'
+import './Legend.css'
+
+const number = new Intl.NumberFormat('pt-BR')
+
+/**
+ * Thread list for the chart. Picking a row highlights that thread in the viewer.
+ */
+export default function Legend({ chart, highlight = null, onHighlight }) {
+  const { colors, total_stitches: total, background } = chart
+
+  return (
+    <section className="legend" aria-label="Legenda de linhas">
+      <header className="legend__header">
+        <h2 className="legend__title">Linhas DMC</h2>
+        <p className="legend__total">
+          {number.format(total)} {total === 1 ? 'ponto' : 'pontos'} em {colors.length}{' '}
+          {colors.length === 1 ? 'cor' : 'cores'}
+        </p>
+      </header>
+
+      <hr className="stitch-rule" />
+
+      <ul className="legend__list">
+        {colors.map((color, index) => {
+          const active = highlight === index
+          return (
+            <li key={color.code}>
+              <button
+                type="button"
+                className={`legend__row${active ? ' legend__row--active' : ''}`}
+                aria-pressed={active}
+                onClick={() => onHighlight?.(active ? null : index)}
+              >
+                <span
+                  className="legend__swatch"
+                  style={{ backgroundColor: color.hex, color: textColorFor(color.rgb) }}
+                  aria-hidden="true"
+                >
+                  {color.symbol}
+                </span>
+                <span className="legend__name">
+                  <span className="legend__code">DMC {color.code}</span>
+                  <span className="legend__label">{color.name}</span>
+                </span>
+                <span className="legend__count">{number.format(color.count)}</span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+
+      {background && (
+        <p className="legend__background">
+          <span
+            className="legend__chip"
+            style={{ backgroundColor: background.hex }}
+            aria-hidden="true"
+          />
+          Fundo sem ponto: DMC {background.code} ({background.name})
+        </p>
+      )}
+    </section>
+  )
+}
