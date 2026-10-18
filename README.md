@@ -106,7 +106,7 @@ O processamento de imagem roda **no servidor** (Python), e o front-end (React) m
 - **Manutenibilidade:** um módulo por tipo de ponto, com testes na parte de processamento.
 - **Custo:** R$ 0 de infraestrutura na v1.
 
-> **Sugestões de limites iniciais (ajustar nos testes):** upload de até 5 MB; grade com no máximo 200×200 pontos; até 40 cores.
+> **Limites padrão** (configuráveis por variáveis de ambiente `STITCHLAB_*`, por exemplo `STITCHLAB_MAX_GRID_WIDTH=400`): upload de até 10 MB; grade de 10 a 300 pontos de largura; de 1 a 40 cores; até 90 mil pontos no total. A ideia é não frustrar quem usa fotos de celular e gráficos grandes, sem deixar o servidor gratuito sobrecarregado.
 
 ## 6. Arquitetura e stack
 
@@ -188,7 +188,11 @@ Prefixo `/api/v1`. Rotas protegidas exigem o token do Supabase no cabeçalho `Au
 | DELETE | `/projects/{id}` | sim | Exclui um projeto |
 | GET | `/projects/{id}/pdf` | sim | Gera e devolve o PDF do projeto |
 
-**Erros padronizados:** `400` (parâmetros inválidos), `401` (sem login), `404` (não encontrado), `413` (arquivo grande), `415` (tipo de arquivo não suportado), `422` (validação).
+**Erros padronizados:** `400` (imagem corrompida), `401` (sem login), `404` (não encontrado), `413` (arquivo ou imagem grande demais), `415` (formato não suportado), `422` (parâmetros fora dos limites ou gráfico grande demais para a imagem).
+
+O corpo dos erros segue o formato `{"detail": {"code": "...", "message": "...", ...}}`. O `code` é estável (ex.: `invalid_grid_width`, `invalid_colors`, `file_too_large`, `image_too_large`, `unsupported_format`, `corrupted_image`, `too_many_stitches`), para o front-end mostrar a mensagem traduzida. No caso de `too_many_stitches`, a resposta traz o `max_grid_width` aceito para aquela imagem.
+
+**`POST /cross-stitch/preview`:** recebe `multipart/form-data` com `image` (arquivo), `grid_width` e `n_colors` (ambos opcionais, com padrão de 100 e 16) e devolve `width`, `height`, `total_stitches`, `colors` (código DMC, nome, hex, rgb, símbolo e contagem) e `grid` (matriz com o índice da cor de cada ponto).
 
 ## 10. Telas
 
@@ -244,8 +248,8 @@ stitchlab/
 - [x] Quantização com k-means em Lab
 - [x] Casamento com o DMC e fusão de duplicatas
 - [x] Símbolos e contagem de pontos
-- [ ] Rota `POST /cross-stitch/preview`
-- [ ] Testes unitários do módulo
+- [x] Rota `POST /cross-stitch/preview`
+- [x] Testes unitários do módulo
 
 ### Fase 2: Front-end do editor (~2–3 dias)
 - [ ] Upload e controles (sliders)
