@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 
-from app.api.chart_input import build_chart
+from app.api.chart_input import build_chart, check_fabric_count
 from app.core.config import Settings, get_settings
 from app.schemas.cross_stitch import CrossStitchPreview
 
@@ -20,8 +20,12 @@ def preview(
         None,
         description="DMC code of a chart color to leave unstitched. Implies ignore_background.",
     ),
+    fabric_count: int | None = Form(
+        None, description="Aida count in stitches per inch. Only changes the size and the skeins."
+    ),
     settings: Settings = Depends(get_settings),
 ) -> CrossStitchPreview:
     """Turn an uploaded image into a cross-stitch chart with a DMC thread legend."""
+    fabric_count = check_fabric_count(fabric_count)
     chart = build_chart(image, grid_width, n_colors, ignore_background, background_code, settings)
-    return CrossStitchPreview.from_chart(chart)
+    return CrossStitchPreview.from_chart(chart, fabric_count)

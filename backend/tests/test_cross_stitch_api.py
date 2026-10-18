@@ -75,7 +75,7 @@ def test_each_color_describes_a_thread_with_a_symbol(client):
     body = post(client, encode(quadrants()), grid_width=20, n_colors=4).json()
 
     for color in body["colors"]:
-        assert set(color) == {"code", "name", "hex", "rgb", "symbol", "count"}
+        assert set(color) == {"code", "name", "hex", "rgb", "symbol", "count", "skeins"}
         assert len(color["rgb"]) == 3
         assert len(color["symbol"]) == 1
     symbols = [color["symbol"] for color in body["colors"]]
@@ -281,3 +281,32 @@ def test_a_single_color_with_the_background_ignored_has_nothing_to_stitch(client
 
     assert response.status_code == 422
     assert error_of(response)["code"] == "nothing_to_stitch"
+
+
+def test_the_chart_reports_its_size_on_14_count_by_default(client):
+    body = post(client, encode(quadrants()), grid_width=28, n_colors=4).json()
+
+    assert body["fabric"] == {"count": 14, "width_cm": 5.1, "height_cm": 5.1}
+
+
+def test_the_fabric_count_changes_the_size(client):
+    body = post(client, encode(quadrants()), grid_width=28, n_colors=4, fabric_count=11).json()
+
+    assert body["fabric"]["count"] == 11
+    assert body["fabric"]["width_cm"] == 6.5
+
+
+def test_every_color_gets_a_skein_estimate(client):
+    body = post(client, encode(quadrants()), grid_width=20, n_colors=4).json()
+
+    assert body["colors"]
+    assert all(color["skeins"] >= 1 for color in body["colors"])
+
+
+def test_an_unknown_fabric_count_is_refused_with_the_choices(client):
+    response = post(client, encode(quadrants()), grid_width=20, fabric_count=13)
+
+    assert response.status_code == 422
+    detail = error_of(response)
+    assert detail["code"] == "invalid_fabric_count"
+    assert 14 in detail["allowed"]
