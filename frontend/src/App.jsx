@@ -6,6 +6,7 @@ import PdfExport from './components/PdfExport.jsx'
 import Step from './components/Step.jsx'
 import StitchFlower from './components/StitchFlower.jsx'
 import Uploader from './components/Uploader.jsx'
+import logo from './assets/pixelinha-logo.svg'
 import { useChart } from './hooks/useChart.js'
 import { useLimits } from './hooks/useLimits.js'
 import { describeError } from './services/errors.js'
@@ -142,7 +143,10 @@ export default function App() {
         <div className="page__brand">
           <StitchFlower size={76} />
           <div>
-            <h1 className="page__title">PixeLinha</h1>
+            <h1 className="page__title">
+              <span className="visually-hidden">PixeLinha</span>
+              <img className="page__logo" src={logo} alt="" aria-hidden="true" />
+            </h1>
             <p className="page__tagline">Transforme qualquer imagem em gráfico de ponto cruz.</p>
           </div>
         </div>

@@ -20,8 +20,13 @@
 }
 
 .page__title {
-  font-size: var(--step-3);
-  letter-spacing: 0.005em;
+  line-height: 1;
+}
+
+.page__logo {
+  display: block;
+  width: clamp(14rem, 62vw, 23rem);
+  height: auto;
 }
 
 .page__tagline {
