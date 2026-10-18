@@ -1,7 +1,11 @@
 import numpy as np
 import pytest
 
-from app.modes.cross_stitch import generate_cross_stitch
+from app.modes.cross_stitch import (
+    BackgroundNotInPalette,
+    NothingToStitch,
+    generate_cross_stitch,
+)
 from app.services.palette import Catalog, DmcColor
 
 
@@ -111,3 +115,93 @@ def test_invalid_parameters_are_reported():
         generate_cross_stitch(random_image(), grid_width=0, n_colors=4)
     with pytest.raises(ValueError):
         generate_cross_stitch(random_image(), grid_width=20, n_colors=0)
+
+
+def drawing_image() -> np.ndarray:
+    """A red square on a white background: one color of artwork plus a background."""
+    image = np.full((80, 80, 3), 255, dtype=np.uint8)
+    image[20:60, 20:60] = (255, 0, 0)
+    return image
+
+
+def test_without_the_option_the_background_stays_stitched():
+    chart = generate_cross_stitch(drawing_image(), grid_width=20, n_colors=2)
+
+    assert chart.background is None
+    assert chart.grid.min() >= 0
+    assert chart.total_stitches == 400
+
+
+def test_the_detected_background_is_left_without_stitches():
+    chart = generate_cross_stitch(
+        drawing_image(), grid_width=20, n_colors=2, ignore_background=True
+    )
+
+    assert len(chart.colors) == 1
+    assert chart.colors[0].count == 100
+    assert chart.total_stitches == 100
+    assert chart.background is not None
+    assert chart.background.count == 300
+    assert int(np.sum(chart.grid == -1)) == 300
+    assert int(np.sum(chart.grid == 0)) == 100
+    assert chart.width * chart.height == 400
+
+
+def test_the_ignored_background_is_the_light_border_color():
+    chart = generate_cross_stitch(
+        drawing_image(), grid_width=20, n_colors=2, ignore_background=True
+    )
+
+    assert min(chart.background.rgb) > 200
+    assert chart.colors[0].rgb[0] > 150 and chart.colors[0].rgb[1] < 100
+
+
+def test_a_chosen_thread_can_be_the_background():
+    plain = generate_cross_stitch(drawing_image(), grid_width=20, n_colors=2)
+    red_code = plain.colors[1].code  # colors are ordered from light to dark
+
+    chart = generate_cross_stitch(
+        drawing_image(), grid_width=20, n_colors=2, background_code=red_code
+    )
+
+    assert chart.background.code == red_code
+    assert chart.background.count == 100
+    assert chart.colors[0].count == 300
+
+
+def test_a_background_thread_that_is_not_in_the_chart_is_reported():
+    with pytest.raises(BackgroundNotInPalette) as error:
+        generate_cross_stitch(
+            drawing_image(), grid_width=20, n_colors=2, background_code="NOPE"
+        )
+
+    assert error.value.code == "NOPE"
+    assert len(error.value.available) == 2
+
+
+def test_nothing_is_left_when_the_whole_image_is_background():
+    with pytest.raises(NothingToStitch):
+        generate_cross_stitch(
+            drawing_image(), grid_width=20, n_colors=1, ignore_background=True
+        )
+
+
+def test_stitch_counts_exclude_the_background():
+    chart = generate_cross_stitch(
+        random_image(), grid_width=30, n_colors=6, ignore_background=True
+    )
+
+    stitched = int(np.sum(chart.grid >= 0))
+    assert chart.total_stitches == stitched
+    assert chart.total_stitches + chart.background.count == chart.width * chart.height
+    assert [c.count for c in chart.colors] == np.bincount(
+        chart.grid[chart.grid >= 0], minlength=len(chart.colors)
+    ).tolist()
+
+
+def test_ignoring_the_background_is_repeatable():
+    first = generate_cross_stitch(drawing_image(), 20, 2, ignore_background=True)
+    second = generate_cross_stitch(drawing_image(), 20, 2, ignore_background=True)
+
+    assert np.array_equal(first.grid, second.grid)
+    assert first.background == second.background
