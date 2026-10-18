@@ -146,6 +146,7 @@ Entrada: imagem + `largura_grade`, `n_cores`, parâmetros opcionais. Saída: gra
 5. **Quantizar com k-means** em `n_cores` clusters (semente fixa para resultado reproduzível).
 6. **Casar com o DMC:** para cada centro de cluster, achar a linha DMC mais próxima em Lab.
 7. **Resolver duplicatas:** se dois clusters caírem na mesma linha DMC, fundi-los.
+7b. **Fundo sem ponto (opcional):** com `ignore_background`, a cor mais comum na borda da imagem vira o tecido liso, sem ponto. Também é possível escolher qual linha ignorar com `background_code`. Para um desenho de uma cor só, peça 2 cores (uma para o desenho e outra para o fundo) e ignore o fundo.
 8. **Atribuir símbolos** únicos por cor (conjunto de símbolos legíveis em impressão pequena).
 9. **Contar pontos** por cor e total.
 10. **Montar a resposta** em JSON: dimensões, paleta (código DMC, nome, RGB, símbolo, contagem) e a matriz da grade.
@@ -192,7 +193,9 @@ Prefixo `/api/v1`. Rotas protegidas exigem o token do Supabase no cabeçalho `Au
 
 O corpo dos erros segue o formato `{"detail": {"code": "...", "message": "...", ...}}`. O `code` é estável (ex.: `invalid_grid_width`, `invalid_colors`, `file_too_large`, `image_too_large`, `unsupported_format`, `corrupted_image`, `too_many_stitches`), para o front-end mostrar a mensagem traduzida. No caso de `too_many_stitches`, a resposta traz o `max_grid_width` aceito para aquela imagem.
 
-**`POST /cross-stitch/preview`:** recebe `multipart/form-data` com `image` (arquivo), `grid_width` e `n_colors` (ambos opcionais, com padrão de 100 e 16) e devolve `width`, `height`, `total_stitches`, `colors` (código DMC, nome, hex, rgb, símbolo e contagem) e `grid` (matriz com o índice da cor de cada ponto).
+**`POST /cross-stitch/preview`:** recebe `multipart/form-data` com `image` (arquivo) e, opcionalmente, `grid_width` (padrão 100), `n_colors` (padrão 16), `ignore_background` (padrão falso) e `background_code` (código DMC de uma cor do gráfico para deixar sem ponto). Devolve `width`, `height`, `total_stitches` (só os pontos a bordar), `colors` (código DMC, nome, hex, rgb, símbolo e contagem), `grid` (matriz com o índice da cor de cada ponto, ou `-1` para uma célula sem ponto) e `background` (a linha ignorada e quantas células ela cobre, ou `null`).
+
+Erros extras desse recurso (`422`): `nothing_to_stitch` (só sobrou fundo) e `background_not_in_palette` (a resposta traz as linhas disponíveis em `available`).
 
 ## 10. Telas
 
@@ -249,6 +252,7 @@ stitchlab/
 - [x] Casamento com o DMC e fusão de duplicatas
 - [x] Símbolos e contagem de pontos
 - [x] Rota `POST /cross-stitch/preview`
+- [x] Opção de deixar o fundo sem ponto (útil para desenhos de uma cor)
 - [x] Testes unitários do módulo
 
 ### Fase 2: Front-end do editor (~2–3 dias)
