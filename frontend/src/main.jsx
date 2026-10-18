@@ -1,5 +1,4 @@
-import '@fontsource/gloock/400.css'
-import '@fontsource-variable/hanken-grotesk/index.css'
+import '@fontsource-variable/fredoka/index.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'

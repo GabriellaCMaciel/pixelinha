@@ -27,8 +27,8 @@
   --leaf-deep: #8ea63a;
   --stitch-line: #b24577;
 
-  --font-display: 'Gloock', 'Iowan Old Style', Georgia, serif;
-  --font-body: 'Hanken Grotesk Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Fredoka Variable', 'Fredoka', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Fredoka Variable', 'Fredoka', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   --step--1: 0.9375rem;
   --step-0: 1.0625rem;
@@ -78,8 +78,8 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 400;
-  line-height: 1.15;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 button,
