@@ -17,17 +17,20 @@ export default function Legend({ chart, highlight = null, onHighlight }) {
   return (
     <section className="legend" aria-label="Legenda de linhas">
       <header className="legend__header">
-        <h2 className="legend__title">Linhas DMC</h2>
+        <h2 className="legend__title">Linhas que você vai usar</h2>
         <p className="legend__total">
-          {number.format(total)} {total === 1 ? 'ponto' : 'pontos'} em {colors.length}{' '}
-          {colors.length === 1 ? 'cor' : 'cores'}
+          {colors.length} {colors.length === 1 ? 'cor' : 'cores'} e {number.format(total)}{' '}
+          {total === 1 ? 'ponto' : 'pontos'}
         </p>
         {fabric && (
           <p className="legend__size">
-            Pronto em Aida {fabric.count}: {centimeters.format(fabric.width_cm)} ×{' '}
-            {centimeters.format(fabric.height_cm)} cm
+            Tamanho pronto: {centimeters.format(fabric.width_cm)} × {centimeters.format(fabric.height_cm)} cm
+            (tecido Aida {fabric.count})
           </p>
         )}
+        <p className="legend__help">
+          DMC é a marca das linhas. Toque numa linha da lista para ver onde ela aparece no gráfico.
+        </p>
       </header>
 
       <hr className="stitch-rule" />

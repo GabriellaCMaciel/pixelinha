@@ -61,14 +61,14 @@ export default function Uploader({ file = null, maxBytes = 0, disabled = false, 
         onDrop={handleDrop}
       >
         <span className="uploader__headline">
-          {file ? file.name : 'Arraste uma imagem para cá'}
+          {file ? file.name : 'Toque aqui para escolher uma foto'}
         </span>
         <span className="uploader__hint">
           {file
-            ? 'Clique ou arraste outra imagem para trocar'
-            : `ou clique para escolher. PNG, JPG ou WEBP${
+            ? 'Toque aqui para trocar de foto'
+            : `JPG, PNG ou WEBP${
                 maxBytes ? `, até ${Math.round(maxBytes / MB)} MB` : ''
-              }`}
+              }. No computador, também dá para arrastar a foto para cá.`}
         </span>
         <input
           id={inputId}

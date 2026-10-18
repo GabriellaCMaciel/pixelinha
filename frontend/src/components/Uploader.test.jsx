@@ -19,7 +19,7 @@ describe('Uploader', () => {
     render(<Uploader onFile={onFile} />)
 
     const file = png()
-    await user.upload(screen.getByLabelText(/Arraste uma imagem/), file)
+    await user.upload(screen.getByLabelText(/Toque aqui para escolher uma foto/), file)
 
     expect(onFile).toHaveBeenCalledWith(file)
   })
@@ -29,7 +29,7 @@ describe('Uploader', () => {
     render(<Uploader onFile={onFile} />)
     const file = png()
 
-    fireEvent.drop(screen.getByText(/Arraste uma imagem/), { dataTransfer: { files: [file] } })
+    fireEvent.drop(screen.getByText(/Toque aqui para escolher uma foto/), { dataTransfer: { files: [file] } })
 
     expect(onFile).toHaveBeenCalledWith(file)
   })
@@ -39,7 +39,7 @@ describe('Uploader', () => {
     render(<Uploader onFile={onFile} />)
     const pdf = new File(['x'], 'doc.pdf', { type: 'application/pdf' })
 
-    fireEvent.drop(screen.getByText(/Arraste uma imagem/), { dataTransfer: { files: [pdf] } })
+    fireEvent.drop(screen.getByText(/Toque aqui para escolher uma foto/), { dataTransfer: { files: [pdf] } })
 
     expect(onFile).not.toHaveBeenCalled()
     expect(screen.getByRole('alert')).toHaveTextContent('Formato não suportado')
@@ -50,7 +50,7 @@ describe('Uploader', () => {
     render(<Uploader maxBytes={1024 * 1024} onFile={onFile} />)
     const big = png('grande.png', 2 * 1024 * 1024)
 
-    fireEvent.drop(screen.getByText(/Arraste uma imagem/), { dataTransfer: { files: [big] } })
+    fireEvent.drop(screen.getByText(/Toque aqui para escolher uma foto/), { dataTransfer: { files: [big] } })
 
     expect(onFile).not.toHaveBeenCalled()
     expect(screen.getByRole('alert')).toHaveTextContent('passa de 1 MB')
@@ -58,7 +58,7 @@ describe('Uploader', () => {
 
   it('clears the warning after a valid image', () => {
     render(<Uploader onFile={() => {}} />)
-    const zone = screen.getByText(/Arraste uma imagem/)
+    const zone = screen.getByText(/Toque aqui para escolher uma foto/)
 
     fireEvent.drop(zone, { dataTransfer: { files: [new File(['x'], 'a.gif', { type: 'image/gif' })] } })
     expect(screen.getByRole('alert')).toBeInTheDocument()
@@ -101,9 +101,9 @@ describe('Uploader', () => {
     const onFile = vi.fn()
     render(<Uploader disabled onFile={onFile} />)
 
-    fireEvent.drop(screen.getByText(/Arraste uma imagem/), { dataTransfer: { files: [png()] } })
+    fireEvent.drop(screen.getByText(/Toque aqui para escolher uma foto/), { dataTransfer: { files: [png()] } })
 
     expect(onFile).not.toHaveBeenCalled()
-    expect(screen.getByLabelText(/Arraste uma imagem/)).toBeDisabled()
+    expect(screen.getByLabelText(/Toque aqui para escolher uma foto/)).toBeDisabled()
   })
 })
