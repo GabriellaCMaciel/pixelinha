@@ -3,6 +3,7 @@ import Controls from './components/Controls.jsx'
 import GridViewer from './components/GridViewer.jsx'
 import Legend from './components/Legend.jsx'
 import PdfExport from './components/PdfExport.jsx'
+import Step from './components/Step.jsx'
 import StitchFlower from './components/StitchFlower.jsx'
 import Uploader from './components/Uploader.jsx'
 import { useChart } from './hooks/useChart.js'
@@ -55,17 +56,15 @@ function Workspace({ limits }) {
 
   return (
     <main className="workspace">
-      <aside className="workspace__side">
+      <Step number={1} title="Escolha a foto" tone="peony" className="workspace__photo">
         <Uploader file={file} maxBytes={limits.max_upload_bytes} onFile={setFile} />
-        <Controls
-          limits={limits}
-          values={values}
-          onChange={(change) => setSettings((previous) => ({ ...previous, ...change }))}
-        />
-        <PdfExport file={file} settings={values} ready={status === 'ready'} />
-      </aside>
+      </Step>
 
-      <div className="workspace__stage">
+      <section className="workspace__stage" aria-labelledby="chart-title">
+        <h2 id="chart-title" className="workspace__stage-title">
+          Seu gráfico
+        </h2>
+
         {status === 'error' && (
           <Notice
             role="alert"
@@ -82,13 +81,17 @@ function Workspace({ limits }) {
             {loading ? (
               <>
                 <StitchFlower size={120} stitching />
-                <p>Gerando o gráfico…</p>
+                <p className="empty__lead">Gerando o gráfico…</p>
               </>
             ) : (
               <>
                 <StitchFlower size={120} />
-                <h2 className="empty__title">O gráfico aparece aqui</h2>
-                <p>Escolha uma imagem ao lado, ou teste com a imagem de exemplo.</p>
+                <p className="empty__lead">Escolha uma foto no passo 1 e o gráfico aparece aqui.</p>
+                <ol className="empty__steps">
+                  <li>Escolha uma foto.</li>
+                  <li>Ajuste o tamanho e as cores.</li>
+                  <li>Baixe o PDF e imprima.</li>
+                </ol>
               </>
             )}
           </div>
@@ -99,22 +102,33 @@ function Workspace({ limits }) {
             Atualizando o gráfico…
           </p>
         )}
-      </div>
+      </section>
 
-      <div className="workspace__legend">
-        {chart ? (
+      {file && (
+        <>
+          <Step number={2} title="Ajuste do seu jeito" tone="honey" className="workspace__adjust">
+            <Controls
+              limits={limits}
+              values={values}
+              onChange={(change) => setSettings((previous) => ({ ...previous, ...change }))}
+            />
+          </Step>
+
+          <Step number={3} title="Baixe e imprima" tone="coral" className="workspace__download">
+            <PdfExport file={file} settings={values} ready={status === 'ready'} />
+          </Step>
+        </>
+      )}
+
+      {chart && (
+        <div className="workspace__legend">
           <Legend
             chart={chart}
             highlight={highlight}
             onHighlight={(index) => setPicked(index === null ? null : { chart, index })}
           />
-        ) : (
-          <section className="legend legend--empty" aria-label="Legenda de linhas">
-            <h2 className="legend__title">Linhas DMC</h2>
-            <p className="legend__total">As cores, os símbolos e a quantidade de pontos aparecem aqui.</p>
-          </section>
-        )}
-      </div>
+        </div>
+      )}
     </main>
   )
 }
