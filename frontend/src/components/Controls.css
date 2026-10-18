@@ -1,35 +1,15 @@
 .controls {
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   min-width: 0;
   margin: 0;
-  padding: 1.5rem 1.4rem;
-  background: var(--honey-wash);
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-patch);
-  /* The sewn edge of the patch. */
-  outline: 2px dashed rgba(166, 64, 111, 0.5);
-  outline-offset: -9px;
 }
 
 .controls:disabled {
   opacity: 0.6;
-}
-
-.controls__title {
-  float: left;
-  width: 100%;
-  margin-bottom: 0.25rem;
-  padding: 0;
-  font-family: var(--font-display);
-  font-size: var(--step-2);
-  line-height: 1.15;
-}
-
-.controls__title + * {
-  clear: both;
 }
 
 .controls__field {

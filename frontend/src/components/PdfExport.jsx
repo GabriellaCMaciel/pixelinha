@@ -47,8 +47,7 @@ export default function PdfExport({ file, settings, ready }) {
   }
 
   return (
-    <section className="pdf" aria-label="Baixar para imprimir">
-      <h2 className="pdf__title">Baixar para imprimir</h2>
+    <div className="pdf">
       <p className="pdf__intro">
         O PDF tem a prévia, a legenda com os novelos e o gráfico em páginas A4 numeradas.
       </p>
@@ -120,6 +119,6 @@ export default function PdfExport({ file, settings, ready }) {
           {describeError(state.error)}
         </p>
       )}
-    </section>
+    </div>
   )
 }
