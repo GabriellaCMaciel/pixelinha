@@ -34,6 +34,7 @@ from app.services.estimate import (
 )
 
 Style = Literal["color", "bw"]
+STYLES: tuple[str, ...] = ("color", "bw")
 
 DEFAULT_TITLE = "Meu gráfico de ponto cruz"
 MAX_TITLE_LENGTH = 60
@@ -570,6 +571,6 @@ def build_pdf(
     style: Style = "color",
 ) -> bytes:
     """Render the chart as a PDF and return its bytes."""
-    if style not in ("color", "bw"):
+    if style not in STYLES:
         raise ValueError("Style must be 'color' or 'bw'.")
     return _Document(chart, fabric_count, clean_title(title), style).render()
