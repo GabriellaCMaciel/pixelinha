@@ -129,11 +129,24 @@ describe('App', () => {
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
     await screen.findByRole('img')
 
-    fireEvent.change(screen.getByRole('slider', { name: 'Largura' }), { target: { value: '60' } })
+    await user.click(screen.getByRole('radio', { name: /Personalizado/ }))
+    fireEvent.change(screen.getByRole('slider', { name: 'Largura do bordado' }), { target: { value: '60' } })
 
     await waitFor(() => expect(generateChart).toHaveBeenCalledTimes(2))
     expect(generateChart.mock.calls[1][0].gridWidth).toBe(60)
     expect(await screen.findByRole('img', { name: /60 por 60/ })).toBeInTheDocument()
+  })
+
+  it('asks again with the width of the chosen size', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
+    await screen.findByRole('img')
+
+    await user.click(screen.getByRole('radio', { name: /Pequeno/ }))
+
+    await waitFor(() => expect(generateChart).toHaveBeenCalledTimes(2))
+    expect(generateChart.mock.calls[1][0].gridWidth).toBe(50)
   })
 
   it('asks again with the chosen fabric', async () => {
