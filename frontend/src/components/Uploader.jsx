@@ -90,7 +90,7 @@ export default function Uploader({ file = null, maxBytes = 0, disabled = false, 
       )}
 
       {!file && (
-        <button type="button" className="uploader__sample" onClick={handleSample} disabled={disabled}>
+        <button type="button" className="btn uploader__sample" onClick={handleSample} disabled={disabled}>
           Testar com uma imagem de exemplo
         </button>
       )}
