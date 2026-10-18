@@ -25,13 +25,13 @@ describe('Legend', () => {
   it('shows the totals', () => {
     render(<Legend chart={chart} />)
 
-    expect(screen.getByText('1.599 pontos em 2 cores')).toBeInTheDocument()
+    expect(screen.getByText('2 cores e 1.599 pontos')).toBeInTheDocument()
   })
 
   it('shows the finished size on the chosen fabric', () => {
     render(<Legend chart={chart} />)
 
-    expect(screen.getByText('Pronto em Aida 14: 7,3 × 7,3 cm')).toBeInTheDocument()
+    expect(screen.getByText('Tamanho pronto: 7,3 × 7,3 cm (tecido Aida 14)')).toBeInTheDocument()
   })
 
   it('estimates the skeins of each color and in total', () => {
@@ -50,7 +50,7 @@ describe('Legend', () => {
     const single = { ...chart, total_stitches: 1, colors: [colors[0]] }
     render(<Legend chart={single} />)
 
-    expect(screen.getByText('1 ponto em 1 cor')).toBeInTheDocument()
+    expect(screen.getByText('1 cor e 1 ponto')).toBeInTheDocument()
   })
 
   it('highlights a thread when its row is picked', async () => {

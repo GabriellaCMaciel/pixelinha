@@ -75,7 +75,7 @@
 
 .pdf__choice-hint {
   color: var(--plum-soft);
-  font-size: 0.8rem;
+  font-size: var(--step--1);
   line-height: 1.3;
 }
 

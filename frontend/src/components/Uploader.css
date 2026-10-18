@@ -7,7 +7,9 @@
 .uploader__drop {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 8rem;
   padding: 1.4rem 1.1rem;
   border: 2.5px dashed var(--berry);
   border-radius: var(--radius-patch);
@@ -36,8 +38,8 @@
   overflow: hidden;
   font-family: var(--font-display);
   font-size: var(--step-1);
+  line-height: 1.25;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .uploader__hint {
