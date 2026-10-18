@@ -5,6 +5,8 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   plugins: [react()],
   server: {
+    // Allow the address GitHub Codespaces gives to a forwarded port.
+    allowedHosts: ['.app.github.dev'],
     // In development the API runs on its own port; the proxy avoids CORS setup.
     proxy: {
       '/api': {

@@ -338,6 +338,18 @@ Cada novo ponto vira um módulo em `backend/app/modes/` e uma opção no seletor
 5. **Edição manual** da grade, outros catálogos de linha e compartilhamento de projetos.
 6. **Recursos com IA** (segunda fase do projeto): sugestão automática de parâmetros, melhoria de imagens e remoção de fundo.
 
+## Testar no navegador
+
+Sem instalar nada: o repositório tem uma configuração para o **GitHub Codespaces** (um computador temporário na nuvem, grátis dentro da cota mensal da conta pessoal).
+
+1. No repositório no GitHub, clique em **Code** → aba **Codespaces** → **Create codespace on main**.
+2. Espere a instalação (alguns minutos na primeira vez). Quando terminar, o app abre numa aba do navegador. Se não abrir, vá na aba **Ports** do editor e clique no globo ao lado de **StitchLab**.
+3. Para reabrir depois, volte em **Code** → **Codespaces** e escolha o existente. Os servidores sobem sozinhos.
+
+O Codespace para sozinho após um tempo parado; para apagar, use a lista em github.com/codespaces.
+
+Para rodar na própria máquina, veja `backend/` (FastAPI) e `frontend/README.md`.
+
 ## Créditos
 
 - **Cores DMC:** Color data: craft-color-codes by [MakeBead](https://makebead.com), licenciado sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Mais detalhes em `backend/app/data/README.md`.
