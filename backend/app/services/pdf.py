@@ -191,8 +191,8 @@ class _Document:
         self.buffer = io.BytesIO()
         self.canvas = Canvas(self.buffer, pagesize=A4)
         self.canvas.setTitle(title)
-        self.canvas.setAuthor("StitchLab")
-        self.canvas.setCreator("StitchLab")
+        self.canvas.setAuthor("PixeLinha")
+        self.canvas.setCreator("PixeLinha")
         self.canvas.setSubject("Gráfico de ponto cruz")
 
     # -- shared pieces ------------------------------------------------------
@@ -204,7 +204,7 @@ class _Document:
         c = self.canvas
         c.setFillColorRGB(*SOFT)
         c.setFont(FONT, 7.5)
-        c.drawString(MARGIN, 9 * mm, note or "Feito com o StitchLab")
+        c.drawString(MARGIN, 9 * mm, note or "Feito com PixeLinha")
         c.drawRightString(PAGE_W - MARGIN, 9 * mm, f"Página {self.page} de {self.total_pages}")
         c.showPage()
 

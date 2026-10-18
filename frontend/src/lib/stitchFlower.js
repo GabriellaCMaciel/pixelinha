@@ -1,5 +1,5 @@
 /*
-  The StitchLab mark: a small flower drawn the way it would be stitched, one
+  The PixeLinha mark: a small flower drawn the way it would be stitched, one
   cross per cell. Letters pick the thread color.
 
     P pink petal     p coral petal tip     H honey     C berry center
