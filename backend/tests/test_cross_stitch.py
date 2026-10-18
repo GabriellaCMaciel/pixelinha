@@ -75,6 +75,14 @@ def test_a_two_color_image_gives_two_threads_even_if_more_are_requested():
     assert len(chart.colors) == 2
 
 
+def test_a_single_color_chart_uses_one_thread_for_every_stitch():
+    chart = generate_cross_stitch(random_image(), grid_width=30, n_colors=1)
+
+    assert len(chart.colors) == 1
+    assert chart.colors[0].count == chart.total_stitches
+    assert np.all(chart.grid == 0)
+
+
 def test_the_same_input_gives_the_same_chart():
     image = random_image()
 

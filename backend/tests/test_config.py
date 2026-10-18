@@ -9,7 +9,7 @@ def test_defaults_are_generous_but_bounded():
     assert settings.max_upload_bytes == 10 * 1024 * 1024
     assert settings.min_grid_width == 10
     assert settings.max_grid_width == 300
-    assert settings.min_colors == 2
+    assert settings.min_colors == 1
     assert settings.max_colors == 40
     assert settings.max_stitches == 90_000
 
