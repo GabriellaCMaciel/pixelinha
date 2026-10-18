@@ -240,7 +240,7 @@ stitchlab/
 - [x] Obter e organizar a tabela DMC (conferir a licença da fonte)
 
 ### Fase 1: Motor do ponto cruz (~2–3 dias)
-- [ ] Redimensionar mantendo a proporção
+- [x] Redimensionar mantendo a proporção
 - [ ] Quantização com k-means em Lab
 - [ ] Casamento com o DMC e fusão de duplicatas
 - [ ] Símbolos e contagem de pontos
