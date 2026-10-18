@@ -113,7 +113,7 @@ O processamento de imagem roda **no servidor** (Python), e o front-end (React) m
 ```
 ┌──────────────────────┐        HTTPS/JSON        ┌───────────────────────────┐
 │  Front-end (React)   │ ───────────────────────► │  API (FastAPI)            │
-│  Vercel              │ ◄─────────────────────── │  Hugging Face Space       │
+│  Vercel              │ ◄─────────────────────── │  Render (Docker)          │
 │  upload, preview,    │                          │  OpenCV, Pillow,          │
 │  zoom, projetos      │                          │  scikit-learn, ReportLab  │
 └─────────┬────────────┘                          └──────────────┬────────────┘
@@ -133,7 +133,7 @@ O processamento de imagem roda **no servidor** (Python), e o front-end (React) m
 | PDF | ReportLab | Controle total do layout da grade |
 | Auth e banco | Supabase (Auth + PostgreSQL) | Gratuito, com login pronto e RLS |
 | Arquivos | Supabase Storage | Imagem original e PDF gerado |
-| Hospedagem da API | Hugging Face Spaces (Docker) | Gratuito, sem cartão e com bastante RAM |
+| Hospedagem da API | Render (Docker) | Plano gratuito sem cartão; 512 MB de RAM; dorme após 15 min sem uso |
 
 ## 7. Pipeline do ponto cruz
 
@@ -281,8 +281,8 @@ pixelinha/
 
 ### Fase 4: PDF e deploy (~2 dias)
 - [x] Geração do PDF (grade paginada + legenda), com tecido, tamanho em cm e novelos
-- [x] Dockerfile, CORS por variável de ambiente e automação do deploy da API (GitHub Actions → Hugging Face Space)
-- [ ] API no ar no Hugging Face Space
+- [x] Dockerfile, CORS por variável de ambiente e `render.yaml` para o deploy da API no Render
+- [ ] API no ar no Render
 - [ ] Front no ar na Vercel
 - [ ] Teste de ponta a ponta em produção
 
@@ -296,12 +296,14 @@ pixelinha/
 | Parte | Serviço | Observações |
 |-------|---------|-------------|
 | Front-end | Vercel | Plano gratuito |
-| API | Hugging Face Spaces (Docker) | CPU gratuita; pode dormir após período sem uso |
+| API | Render (Docker) | Plano gratuito: 0,1 CPU e 512 MB de RAM; dorme após 15 min sem visitas e leva cerca de 1 min para acordar |
 | Banco, auth e arquivos | Supabase | Plano gratuito, com limites de armazenamento |
 
 **Cuidados**
-- O Space precisa escutar na porta configurada em `app_port` (a padrão para Spaces Docker é 7860). Não usar `--reload` em produção.
-- O sistema de arquivos do Space é efêmero, então **nada importante deve ser salvo em disco local**: tudo vai para o Supabase.
+- A API escuta na porta da variável `PORT` (o Render usa 10000 por padrão). Não usar `--reload` em produção.
+- Com só 512 MB de memória, o limite de imagem em produção é de 16 megapixels (`PIXELINHA_MAX_IMAGE_PIXELS`, definido no `render.yaml`).
+- O Hugging Face Spaces com Docker deixou de ser gratuito em 2026 (passou a exigir o plano PRO), por isso a API está no Render.
+- O sistema de arquivos do plano gratuito é efêmero, então **nada importante deve ser salvo em disco local**: tudo vai para o Supabase.
 - Se a API estiver dormindo, o primeiro acesso demora. Mostrar uma mensagem de "acordando o servidor" no front.
 - Configurar CORS apenas para o domínio do front.
 - Nunca commitar chaves: usar variáveis de ambiente (`SUPABASE_URL`, `SUPABASE_KEY`, etc.).
@@ -309,21 +311,20 @@ pixelinha/
 
 ### Como publicar (passo a passo)
 
-**1. API no Hugging Face (automático)**
-1. Crie uma conta em huggingface.co e, em *Settings → Access Tokens*, um token do tipo *Write*.
-2. No GitHub, em *Settings → Secrets and variables → Actions → New repository secret*, crie o segredo `HF_TOKEN` com esse token. Nunca cole o token em arquivos nem em conversas.
-3. Em *Actions → Deploy backend → Run workflow*. O script `.github/scripts/deploy_space.py` cria o Space `seu-usuario/pixelinha-api` (se não existir), define o CORS e envia a pasta `backend/`. Depois de alguns minutos de build, a API responde em `https://seu-usuario-pixelinha-api.hf.space/api/v1/health`.
-4. A partir daí, todo push em `main` que mexer em `backend/` publica de novo.
-
-Variáveis opcionais (aba *Variables*): `HF_SPACE` (outro nome de Space), `ALLOWED_ORIGINS` (sites extras, separados por vírgula) e `ALLOWED_ORIGIN_REGEX` (padrão: endereços `pixelinha*.vercel.app`).
+**1. API no Render**
+1. Em render.com, entre com a conta do GitHub (*Sign in with GitHub*) e autorize o repositório `pixelinha`.
+2. No painel, *New +* → *Blueprint* → escolha o repositório. O Render lê o `render.yaml`, mostra o serviço `pixelinha-api` no plano *Free* e pede para confirmar (*Deploy Blueprint*).
+3. Espere o build (alguns minutos). No topo da página do serviço aparece o endereço, algo como `https://pixelinha-api.onrender.com`. Teste abrindo `/api/v1/health` nesse endereço.
+4. Todo push em `main` que mexer em `backend/` publica de novo, sozinho.
 
 **2. Front na Vercel**
 1. Em vercel.com, *Add New → Project* e importe este repositório.
 2. Em *Root Directory*, escolha `frontend`.
-3. Em *Environment Variables*, crie `VITE_API_URL` com o endereço da API (passo 3 acima, sem a barra final) e faça o deploy.
+3. Em *Environment Variables*, crie `VITE_API_URL` com o endereço da API (sem a barra final) e faça o deploy.
+4. Se o endereço do site na Vercel não começar com `pixelinha` (por exemplo, o nome estava ocupado), ajuste `PIXELINHA_ALLOWED_ORIGIN_REGEX` no painel do Render (*Environment*) para incluir o endereço real.
 
-**3. Manter a API acordada (opcional)**
-Crie a variável `API_URL` no GitHub (o mesmo endereço da API). O workflow `keepalive.yml` chama `/api/v1/health` todo dia e evita que o Space durma.
+**3. Acordar a API (opcional)**
+Crie a variável `API_URL` no GitHub (o mesmo endereço da API). Antes de mostrar o projeto a alguém, rode *Actions → Wake the API → Run workflow* e espere cerca de 1 minuto.
 
 ## 14. Testes e qualidade
 
@@ -391,7 +392,7 @@ Para rodar na própria máquina, veja `backend/` (FastAPI) e `frontend/README.md
 
 **PixeLinha** is a full-stack web app that converts an uploaded image into embroidery charts, starting with **cross-stitch**. The user picks a grid size and number of colors, and the app returns a symbol chart, a thread legend matched to the **DMC** catalog (with stitch counts), and a printable **PDF**.
 
-**Stack:** React + Vite (Vercel) · Python/FastAPI with OpenCV, Pillow, scikit-learn and ReportLab (Hugging Face Spaces, Docker) · Supabase for auth, PostgreSQL and storage. The whole setup runs on free tiers.
+**Stack:** React + Vite (Vercel) · Python/FastAPI with OpenCV, Pillow, scikit-learn and ReportLab (Render, Docker) · Supabase for auth, PostgreSQL and storage. The whole setup runs on free tiers.
 
 **Core pipeline:** resize preserving aspect ratio → convert to Lab color space → k-means color quantization → nearest DMC thread match → symbol assignment → stitch counts.
 
