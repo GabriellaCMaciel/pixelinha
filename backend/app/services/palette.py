@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from app.services.color import rgb_to_lab
+from app.services.quantization import Quantized
 
 DMC_CATALOG_PATH = Path(__file__).resolve().parent.parent / "data" / "dmc.json"
 
@@ -17,6 +18,18 @@ class DmcColor:
     name: str
     hex: str
     rgb: tuple[int, int, int]
+
+
+@dataclass(frozen=True)
+class MatchedPalette:
+    """An image whose colors were matched to real threads.
+
+    labels: (height, width) array with the palette index of every stitch.
+    colors: the threads used, ordered from the lightest to the darkest.
+    """
+
+    labels: np.ndarray
+    colors: list[DmcColor]
 
 
 class Catalog:
@@ -68,3 +81,25 @@ def load_catalog(path: Path) -> Catalog:
 def load_dmc_catalog() -> Catalog:
     """Load the bundled DMC catalog once and reuse it."""
     return load_catalog(DMC_CATALOG_PATH)
+
+
+def match_palette(quantized: Quantized, catalog: Catalog) -> MatchedPalette:
+    """Match each color cluster to its nearest thread and merge clusters that share one.
+
+    Two clusters can land on the same thread, and a thread must appear only once
+    in the legend, so their stitches are merged under a single palette entry.
+    """
+    nearest = catalog.nearest(quantized.centers_lab)
+
+    # Unique threads, lightest first, so the palette order is stable.
+    used = np.unique(nearest)
+    order = used[np.argsort(-catalog.lab[used, 0], kind="stable")]
+
+    position = np.empty(len(catalog), dtype=np.int64)
+    position[order] = np.arange(len(order))
+    cluster_to_palette = position[nearest]
+
+    return MatchedPalette(
+        labels=cluster_to_palette[quantized.labels],
+        colors=[catalog.colors[int(index)] for index in order],
+    )
