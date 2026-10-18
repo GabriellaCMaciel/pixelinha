@@ -10,6 +10,7 @@ from app.modes.cross_stitch import (
     NothingToStitch,
     generate_cross_stitch,
 )
+from app.services.estimate import DEFAULT_FABRIC_COUNT, FABRIC_COUNTS
 from app.services.imaging import (
     ImageDecodeError,
     ImageTooLarge,
@@ -25,6 +26,20 @@ DEFAULT_COLORS = 16
 
 def _within(value: int, low: int, high: int) -> int:
     return max(low, min(value, high))
+
+
+def check_fabric_count(fabric_count: int | None) -> int:
+    """The fabric count to use, or a 422 error listing the counts we offer."""
+    if fabric_count is None:
+        return DEFAULT_FABRIC_COUNT
+    if fabric_count not in FABRIC_COUNTS:
+        raise api_error(
+            422,
+            "invalid_fabric_count",
+            f"Fabric count must be one of {', '.join(str(count) for count in FABRIC_COUNTS)}.",
+            allowed=list(FABRIC_COUNTS),
+        )
+    return fabric_count
 
 
 def build_chart(
