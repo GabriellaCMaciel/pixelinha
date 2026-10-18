@@ -5,7 +5,7 @@ name: Deploy back-end
 # settings (Settings > Secrets and variables > Actions):
 #   secret   HF_TOKEN             a Hugging Face access token with write permission
 # Optional variables:
-#   HF_SPACE              "your-user/name" (default: your-user/stitchlab-api)
+#   HF_SPACE              "your-user/name" (default: your-user/pixelinha-api)
 #   ALLOWED_ORIGINS       sites allowed to call the API, comma separated
 #   ALLOWED_ORIGIN_REGEX  pattern for allowed sites (default: this project's Vercel addresses)
 # Without the token the job says so and finishes.

@@ -128,7 +128,7 @@ export default function App() {
         <div className="page__brand">
           <StitchFlower size={76} />
           <div>
-            <h1 className="page__title">StitchLab</h1>
+            <h1 className="page__title">PixeLinha</h1>
             <p className="page__tagline">Transforme qualquer imagem em gráfico de ponto cruz.</p>
           </div>
         </div>

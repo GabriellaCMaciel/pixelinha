@@ -2,7 +2,7 @@
 
 Reads from the environment:
   HF_TOKEN                a token with write permission (required)
-  HF_SPACE                "user/name" of the Space (default: <token owner>/stitchlab-api)
+  HF_SPACE                "user/name" of the Space (default: <token owner>/pixelinha-api)
   ALLOWED_ORIGINS         sites allowed to call the API, comma separated (optional)
   ALLOWED_ORIGIN_REGEX    pattern of allowed sites (default: Vercel addresses of this project)
   GITHUB_SHA              used in the commit message
@@ -14,8 +14,8 @@ from pathlib import Path
 
 from huggingface_hub import HfApi
 
-DEFAULT_SPACE_NAME = "stitchlab-api"
-DEFAULT_ORIGIN_REGEX = r"https://stitchlab[a-z0-9-]*\.vercel\.app"
+DEFAULT_SPACE_NAME = "pixelinha-api"
+DEFAULT_ORIGIN_REGEX = r"https://pixelinha[a-z0-9-]*\.vercel\.app"
 IGNORE = [
     ".venv/*",
     ".pytest_cache/*",
@@ -46,9 +46,9 @@ def main() -> int:
 
     origins = os.environ.get("ALLOWED_ORIGINS", "").strip()
     if origins:
-        api.add_space_variable(repo_id, "STITCHLAB_ALLOWED_ORIGINS", origins)
+        api.add_space_variable(repo_id, "PIXELINHA_ALLOWED_ORIGINS", origins)
     regex = os.environ.get("ALLOWED_ORIGIN_REGEX", "").strip() or DEFAULT_ORIGIN_REGEX
-    api.add_space_variable(repo_id, "STITCHLAB_ALLOWED_ORIGIN_REGEX", regex)
+    api.add_space_variable(repo_id, "PIXELINHA_ALLOWED_ORIGIN_REGEX", regex)
 
     api.upload_folder(
         folder_path="backend",

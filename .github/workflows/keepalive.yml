@@ -2,7 +2,7 @@ name: Keep the API awake
 
 # Free Hugging Face Spaces go to sleep after about two days without visits,
 # and the first visitor then waits about a minute. A daily ping avoids that.
-# Needs the repository variable API_URL, like "https://your-user-stitchlab-api.hf.space".
+# Needs the repository variable API_URL, like "https://your-user-pixelinha-api.hf.space".
 
 on:
   schedule:

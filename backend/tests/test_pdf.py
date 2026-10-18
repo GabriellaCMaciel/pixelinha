@@ -206,4 +206,4 @@ def test_the_pdf_carries_the_title_as_metadata(chart):
     metadata = read(build_pdf(chart, title="Minha flor")).metadata
 
     assert metadata.title == "Minha flor"
-    assert metadata.author == "StitchLab"
+    assert metadata.author == "PixeLinha"

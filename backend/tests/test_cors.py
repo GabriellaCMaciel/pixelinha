@@ -21,20 +21,20 @@ def test_only_local_development_is_allowed_by_default():
 
 def test_reads_a_comma_separated_list_of_sites():
     cors = load_cors(
-        {"STITCHLAB_ALLOWED_ORIGINS": " https://stitchlab.vercel.app/ , https://stitchlab.dev ,"}
+        {"PIXELINHA_ALLOWED_ORIGINS": " https://pixelinha.vercel.app/ , https://pixelinha.dev ,"}
     )
 
-    assert cors.origins == ("https://stitchlab.vercel.app", "https://stitchlab.dev")
+    assert cors.origins == ("https://pixelinha.vercel.app", "https://pixelinha.dev")
 
 
 def test_an_empty_setting_falls_back_to_the_defaults():
-    assert load_cors({"STITCHLAB_ALLOWED_ORIGINS": "  "}).origins == DEFAULT_ALLOWED_ORIGINS
+    assert load_cors({"PIXELINHA_ALLOWED_ORIGINS": "  "}).origins == DEFAULT_ALLOWED_ORIGINS
 
 
 def test_reads_an_optional_pattern():
-    cors = load_cors({"STITCHLAB_ALLOWED_ORIGIN_REGEX": r"https://stitchlab-.*\.vercel\.app"})
+    cors = load_cors({"PIXELINHA_ALLOWED_ORIGIN_REGEX": r"https://pixelinha-.*\.vercel\.app"})
 
-    assert cors.origin_regex == r"https://stitchlab-.*\.vercel\.app"
+    assert cors.origin_regex == r"https://pixelinha-.*\.vercel\.app"
 
 
 def test_an_allowed_site_can_read_the_response(client):

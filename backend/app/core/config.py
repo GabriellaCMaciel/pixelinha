@@ -2,7 +2,7 @@ import os
 from dataclasses import dataclass, fields
 from functools import cache
 
-ENV_PREFIX = "STITCHLAB_"
+ENV_PREFIX = "PIXELINHA_"
 
 
 @dataclass(frozen=True)
@@ -10,7 +10,7 @@ class Settings:
     """Limits that keep the service responsive without getting in the user's way.
 
     Each value can be overridden with an environment variable named after the
-    field, for example STITCHLAB_MAX_GRID_WIDTH=400.
+    field, for example PIXELINHA_MAX_GRID_WIDTH=400.
     """
 
     max_upload_bytes: int = 10 * 1024 * 1024
@@ -32,7 +32,7 @@ class Settings:
 
 
 def load_settings(environ: dict[str, str] | None = None) -> Settings:
-    """Build the settings from defaults plus any STITCHLAB_* environment overrides."""
+    """Build the settings from defaults plus any PIXELINHA_* environment overrides."""
     environ = os.environ if environ is None else environ
 
     overrides: dict[str, int] = {}
@@ -68,8 +68,8 @@ class CorsSettings:
 def load_cors(environ: dict[str, str] | None = None) -> CorsSettings:
     """Read the allowed origins from the environment.
 
-    STITCHLAB_ALLOWED_ORIGINS is a comma-separated list of sites, for example
-    "https://stitchlab.vercel.app". STITCHLAB_ALLOWED_ORIGIN_REGEX can add a
+    PIXELINHA_ALLOWED_ORIGINS is a comma-separated list of sites, for example
+    "https://pixelinha.vercel.app". PIXELINHA_ALLOWED_ORIGIN_REGEX can add a
     pattern, useful for the preview addresses Vercel makes for each branch.
     Without them only the local development server is allowed.
     """
