@@ -52,3 +52,31 @@ def load_settings(environ: dict[str, str] | None = None) -> Settings:
 @cache
 def get_settings() -> Settings:
     return load_settings()
+
+
+DEFAULT_ALLOWED_ORIGINS = ("http://localhost:5173", "http://127.0.0.1:5173")
+
+
+@dataclass(frozen=True)
+class CorsSettings:
+    """Which web pages may call the API from a browser."""
+
+    origins: tuple[str, ...]
+    origin_regex: str | None = None
+
+
+def load_cors(environ: dict[str, str] | None = None) -> CorsSettings:
+    """Read the allowed origins from the environment.
+
+    STITCHLAB_ALLOWED_ORIGINS is a comma-separated list of sites, for example
+    "https://stitchlab.vercel.app". STITCHLAB_ALLOWED_ORIGIN_REGEX can add a
+    pattern, useful for the preview addresses Vercel makes for each branch.
+    Without them only the local development server is allowed.
+    """
+    environ = os.environ if environ is None else environ
+
+    raw = environ.get(f"{ENV_PREFIX}ALLOWED_ORIGINS", "")
+    origins = tuple(item.strip().rstrip("/") for item in raw.split(",") if item.strip())
+    regex = environ.get(f"{ENV_PREFIX}ALLOWED_ORIGIN_REGEX", "").strip() or None
+
+    return CorsSettings(origins=origins or DEFAULT_ALLOWED_ORIGINS, origin_regex=regex)
