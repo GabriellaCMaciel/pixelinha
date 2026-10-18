@@ -142,3 +142,22 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.controls__select {
+  width: 100%;
+  padding: 0.55rem 2.5rem 0.55rem 0.9rem;
+  border: 2px solid var(--plum);
+  border-radius: var(--radius-pill);
+  background-color: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1.5 1.5l5.5 5.5 5.5-5.5' fill='none' stroke='%233b1830' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.controls__select:hover {
+  background-color: var(--peony-wash);
+}

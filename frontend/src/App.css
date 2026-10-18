@@ -113,7 +113,7 @@
 /* Side by side once there is room for controls, chart and legend. */
 @media (min-width: 64rem) {
   .workspace {
-    grid-template-columns: 20rem minmax(0, 1fr) 18.5rem;
+    grid-template-columns: 20rem minmax(0, 1fr) 20rem;
   }
 
   .workspace__stage {

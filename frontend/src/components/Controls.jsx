@@ -37,6 +37,7 @@ function Slider({ label, hint, value, min, max, unit, onChange }) {
  */
 export default function Controls({ limits, values, onChange, disabled = false }) {
   const backgroundId = useId()
+  const fabricId = useId()
 
   return (
     <fieldset className="controls" disabled={disabled}>
@@ -61,6 +62,28 @@ export default function Controls({ limits, values, onChange, disabled = false })
         unit={(n) => (n === 1 ? 'cor' : 'cores')}
         onChange={(nColors) => onChange({ nColors })}
       />
+
+      <div className="controls__field">
+        <label htmlFor={fabricId} className="controls__label">
+          Tecido
+        </label>
+        <select
+          id={fabricId}
+          className="controls__select"
+          value={values.fabricCount}
+          onChange={(event) => onChange({ fabricCount: Number(event.target.value) })}
+          aria-describedby={`${fabricId}-hint`}
+        >
+          {limits.fabric_counts.map((count) => (
+            <option key={count} value={count}>
+              Aida {count}
+            </option>
+          ))}
+        </select>
+        <p id={`${fabricId}-hint`} className="controls__hint">
+          Define o tamanho final em centímetros e os novelos de cada cor. Aida 14 é a mais comum.
+        </p>
+      </div>
 
       <div className="controls__field controls__field--check">
         <input

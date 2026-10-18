@@ -8,7 +8,10 @@ vi.mock('./services/api.js', async (importOriginal) => ({
   ...(await importOriginal()),
   fetchLimits: vi.fn(),
   generateChart: vi.fn(),
+  downloadPdf: vi.fn(),
 }))
+
+vi.mock('./lib/saveFile.js', () => ({ saveFile: vi.fn() }))
 
 vi.mock('./lib/sampleImage.js', () => ({
   createSampleImage: vi.fn(() =>
@@ -16,7 +19,8 @@ vi.mock('./lib/sampleImage.js', () => ({
   ),
 }))
 
-const { fetchLimits, generateChart } = await import('./services/api.js')
+const { fetchLimits, generateChart, downloadPdf } = await import('./services/api.js')
+const { saveFile } = await import('./lib/saveFile.js')
 
 const limits = {
   max_upload_bytes: 10 * 1024 * 1024,
@@ -26,6 +30,8 @@ const limits = {
   min_colors: 1,
   max_colors: 40,
   max_stitches: 90_000,
+  fabric_counts: [11, 14, 16, 18, 20, 22],
+  default_fabric_count: 14,
 }
 
 function chartOf(width, extra = {}) {
@@ -33,8 +39,9 @@ function chartOf(width, extra = {}) {
     width,
     height: width,
     total_stitches: width * width,
+    fabric: { count: 14, width_cm: 10, height_cm: 10 },
     colors: [
-      { code: '310', name: 'Black', hex: '#000000', rgb: [0, 0, 0], symbol: '●', count: width * width },
+      { code: '310', name: 'Black', hex: '#000000', rgb: [0, 0, 0], symbol: '●', count: width * width, skeins: 2 },
     ],
     grid: Array.from({ length: width }, () => Array(width).fill(0)),
     background: null,
@@ -45,7 +52,10 @@ function chartOf(width, extra = {}) {
 beforeEach(() => {
   fetchLimits.mockReset()
   generateChart.mockReset()
+  downloadPdf.mockReset()
+  saveFile.mockReset()
   fetchLimits.mockResolvedValue(limits)
+  downloadPdf.mockResolvedValue({ blob: new Blob(['%PDF']), fileName: 'grafico.pdf' })
   generateChart.mockImplementation(({ gridWidth }) => Promise.resolve(chartOf(gridWidth)))
 
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
@@ -112,6 +122,19 @@ describe('App', () => {
     expect(await screen.findByRole('img', { name: /60 por 60/ })).toBeInTheDocument()
   })
 
+  it('asks again with the chosen fabric', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
+    await screen.findByRole('img')
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Tecido' }), '18')
+
+    await waitFor(() => expect(generateChart).toHaveBeenCalledTimes(2))
+    expect(generateChart.mock.calls[0][0].fabricCount).toBe(14)
+    expect(generateChart.mock.calls[1][0].fabricCount).toBe(18)
+  })
+
   it('sends the unstitched background option', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -137,6 +160,32 @@ describe('App', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Só sobrou o fundo')
     expect(screen.getByRole('img')).toBeInTheDocument()
+  })
+
+  it('keeps the PDF button locked until there is a chart', async () => {
+    render(<App />)
+
+    expect(await screen.findByRole('button', { name: 'Baixar PDF' })).toBeDisabled()
+  })
+
+  it('downloads the PDF of the chart on screen', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
+    await screen.findByRole('img')
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Tecido' }), '18')
+    await waitFor(() => expect(generateChart).toHaveBeenCalledTimes(2))
+    await screen.findByRole('img')
+    await user.click(screen.getByRole('button', { name: 'Baixar PDF' }))
+
+    await waitFor(() => expect(saveFile).toHaveBeenCalled())
+    expect(downloadPdf.mock.calls[0][0]).toMatchObject({
+      gridWidth: 100,
+      nColors: 16,
+      fabricCount: 18,
+      style: 'color',
+    })
   })
 
   it('highlights a thread from the legend', async () => {

@@ -4,11 +4,12 @@ import { describe, expect, it, vi } from 'vitest'
 import Legend from './Legend.jsx'
 
 const colors = [
-  { code: '310', name: 'Black', hex: '#000000', rgb: [0, 0, 0], symbol: '●', count: 1500 },
-  { code: '666', name: 'Bright Red', hex: '#e31d42', rgb: [227, 29, 66], symbol: '■', count: 99 },
+  { code: '310', name: 'Black', hex: '#000000', rgb: [0, 0, 0], symbol: '●', count: 1500, skeins: 1 },
+  { code: '666', name: 'Bright Red', hex: '#e31d42', rgb: [227, 29, 66], symbol: '■', count: 99, skeins: 1 },
 ]
 
-const chart = { width: 40, height: 40, total_stitches: 1599, colors, grid: [], background: null }
+const fabric = { count: 14, width_cm: 7.3, height_cm: 7.3 }
+const chart = { width: 40, height: 40, total_stitches: 1599, colors, fabric, grid: [], background: null }
 
 describe('Legend', () => {
   it('lists every thread with its code, name and count', () => {
@@ -25,6 +26,24 @@ describe('Legend', () => {
     render(<Legend chart={chart} />)
 
     expect(screen.getByText('1.599 pontos em 2 cores')).toBeInTheDocument()
+  })
+
+  it('shows the finished size on the chosen fabric', () => {
+    render(<Legend chart={chart} />)
+
+    expect(screen.getByText('Pronto em Aida 14: 7,3 × 7,3 cm')).toBeInTheDocument()
+  })
+
+  it('estimates the skeins of each color and in total', () => {
+    const many = {
+      ...chart,
+      colors: [{ ...colors[0], skeins: 3 }, { ...colors[1], skeins: 1 }],
+    }
+    render(<Legend chart={many} />)
+
+    expect(screen.getByText('3 novelos')).toBeInTheDocument()
+    expect(screen.getByText('1 novelo')).toBeInTheDocument()
+    expect(screen.getByText('Estimativa: 4 novelos no total')).toBeInTheDocument()
   })
 
   it('uses the singular for one stitch of one color', () => {

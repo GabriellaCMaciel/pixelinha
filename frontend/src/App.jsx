@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Controls from './components/Controls.jsx'
 import GridViewer from './components/GridViewer.jsx'
 import Legend from './components/Legend.jsx'
+import PdfExport from './components/PdfExport.jsx'
 import StitchFlower from './components/StitchFlower.jsx'
 import Uploader from './components/Uploader.jsx'
 import { useChart } from './hooks/useChart.js'
@@ -9,7 +10,7 @@ import { useLimits } from './hooks/useLimits.js'
 import { describeError } from './services/errors.js'
 import './App.css'
 
-const DEFAULTS = { gridWidth: 100, nColors: 16, ignoreBackground: false }
+const DEFAULTS = { gridWidth: 100, nColors: 16, ignoreBackground: false, fabricCount: 14 }
 
 const within = (value, low, high) => Math.min(high, Math.max(low, value))
 
@@ -40,6 +41,9 @@ function Workspace({ limits }) {
     ...settings,
     gridWidth: within(settings.gridWidth, limits.min_grid_width, limits.max_grid_width),
     nColors: within(settings.nColors, limits.min_colors, limits.max_colors),
+    fabricCount: limits.fabric_counts.includes(settings.fabricCount)
+      ? settings.fabricCount
+      : limits.default_fabric_count,
   }
 
   const { chart, status, error, retry } = useChart({ file, ...values })
@@ -58,6 +62,7 @@ function Workspace({ limits }) {
           values={values}
           onChange={(change) => setSettings((previous) => ({ ...previous, ...change }))}
         />
+        <PdfExport file={file} settings={values} ready={status === 'ready'} />
       </aside>
 
       <div className="workspace__stage">

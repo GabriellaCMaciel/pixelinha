@@ -25,6 +25,13 @@ def test_limits_match_the_default_settings(client):
     assert body["max_upload_bytes"] == 10 * 1024 * 1024
 
 
+def test_limits_offer_the_fabric_counts(client):
+    body = client.get("/api/v1/limits").json()
+
+    assert body["fabric_counts"] == [11, 14, 16, 18, 20, 22]
+    assert body["default_fabric_count"] == 14
+
+
 def test_limits_follow_the_configured_settings(client):
     settings = Settings(max_grid_width=500, max_colors=20)
     app.dependency_overrides[get_settings] = lambda: settings
@@ -38,4 +45,4 @@ def test_limits_follow_the_configured_settings(client):
 def test_limits_expose_every_setting(client):
     body = client.get("/api/v1/limits").json()
 
-    assert set(body) == set(Settings.__dataclass_fields__)
+    assert set(Settings.__dataclass_fields__) <= set(body)
