@@ -29,7 +29,7 @@ describe('PdfExport', () => {
     render(<PdfExport file={null} settings={settings} ready={false} />)
 
     expect(screen.getByRole('button', { name: 'Baixar PDF' })).toBeDisabled()
-    expect(screen.getByText(/Escolha uma imagem e espere o gráfico/)).toBeInTheDocument()
+    expect(screen.getByText(/O botão libera quando o gráfico estiver pronto/)).toBeInTheDocument()
   })
 
   it('downloads the chart with the settings on screen', async () => {

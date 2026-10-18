@@ -47,10 +47,9 @@ export default function PdfExport({ file, settings, ready }) {
   }
 
   return (
-    <section className="pdf" aria-label="Baixar para imprimir">
-      <h2 className="pdf__title">Baixar para imprimir</h2>
+    <div className="pdf">
       <p className="pdf__intro">
-        O PDF tem a prévia, a legenda com os novelos e o gráfico em páginas A4 numeradas.
+        O PDF traz o gráfico em folhas A4 numeradas, a lista de linhas com os novelos de cada cor e uma prévia da imagem.
       </p>
 
       <div className="pdf__field">
@@ -103,7 +102,7 @@ export default function PdfExport({ file, settings, ready }) {
       </button>
 
       {!ready && !working && (
-        <p className="pdf__note">Escolha uma imagem e espere o gráfico para liberar o PDF.</p>
+        <p className="pdf__note">O botão libera quando o gráfico estiver pronto.</p>
       )}
       {working && (
         <p className="pdf__note" role="status">
@@ -120,6 +119,6 @@ export default function PdfExport({ file, settings, ready }) {
           {describeError(state.error)}
         </p>
       )}
-    </section>
+    </div>
   )
 }

@@ -30,32 +30,49 @@
   font-size: var(--step-1);
 }
 
+/* The order on the page is the order of the steps: photo, chart, adjustments, PDF, thread list. */
 .workspace {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
   align-items: start;
 }
 
-.workspace__side,
-.workspace__stage,
-.workspace__legend {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  min-width: 0;
+.workspace__photo {
+  grid-area: photo;
 }
 
 .workspace__stage {
+  grid-area: stage;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.workspace__adjust {
+  grid-area: adjust;
+}
+
+.workspace__download {
+  grid-area: download;
 }
 
 .workspace__legend {
+  grid-area: legend;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   max-height: 80vh;
 }
 
 .workspace__legend .legend {
   min-height: 0;
+}
+
+.workspace__stage-title {
+  font-size: var(--step-2);
 }
 
 .empty {
@@ -64,7 +81,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.9rem;
-  min-height: 22rem;
+  min-height: 16rem;
   padding: 2rem 1.5rem;
   border: 3px dashed rgba(166, 64, 111, 0.65);
   border-radius: var(--radius-patch);
@@ -73,14 +90,27 @@
   text-align: center;
 }
 
-.empty__title {
+.empty__lead {
+  max-width: 28rem;
   color: var(--plum);
-  font-size: var(--step-2);
+  font-size: var(--step-1);
+  font-weight: 600;
+}
+
+.empty__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  color: var(--plum-soft);
+  font-size: var(--step-0);
+  list-style-position: inside;
 }
 
 .stage__updating {
   position: absolute;
-  top: 4rem;
+  top: 6.5rem;
   right: 1rem;
   padding: 0.25rem 0.85rem;
   border: 2px solid var(--plum);
@@ -110,14 +140,23 @@
   font-weight: 600;
 }
 
-/* Side by side once there is room for controls, chart and legend. */
+/* Side by side once there is room: steps on the left, chart in the middle, thread list on the right. */
 @media (min-width: 64rem) {
   .workspace {
-    grid-template-columns: 20rem minmax(0, 1fr) 20rem;
+    grid-template-columns: 22rem minmax(0, 1fr) 20rem;
+    grid-template-areas:
+      'photo stage legend'
+      'adjust stage legend'
+      'download stage legend';
   }
 
   .workspace__stage {
+    grid-row: 1 / span 3;
     min-height: 36rem;
+  }
+
+  .workspace__legend {
+    grid-row: 1 / span 3;
   }
 
   .workspace__stage .viewer {
@@ -125,17 +164,42 @@
   }
 
   .empty {
-    min-height: 36rem;
+    min-height: 30rem;
   }
 }
 
 @media (min-width: 48rem) and (max-width: 63.99rem) {
   .workspace {
-    grid-template-columns: 20rem minmax(0, 1fr);
+    grid-template-columns: 22rem minmax(0, 1fr);
+    grid-template-areas:
+      'photo stage'
+      'adjust stage'
+      'download stage'
+      'legend legend';
+  }
+
+  .workspace__stage {
+    grid-row: 1 / span 3;
   }
 
   .workspace__legend {
-    grid-column: 1 / -1;
+    grid-row: auto;
+    max-height: none;
+  }
+}
+
+/* One column: photo, chart, adjustments, PDF, thread list. */
+@media (max-width: 47.99rem) {
+  .workspace {
+    grid-template-areas:
+      'photo'
+      'stage'
+      'adjust'
+      'download'
+      'legend';
+  }
+
+  .workspace__legend {
     max-height: none;
   }
 }
