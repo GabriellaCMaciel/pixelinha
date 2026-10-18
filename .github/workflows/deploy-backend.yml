@@ -1,10 +1,14 @@
 name: Deploy back-end
 
-# Sends the backend/ folder to the Hugging Face Space whenever the back-end
-# changes on main. Needs, in the repository settings:
-#   secret   HF_TOKEN  a Hugging Face access token with write permission
-#   variable HF_SPACE  the Space, like "your-user/stitchlab-api"
-# Without them the job just says so and finishes.
+# Sends the backend/ folder to a Hugging Face Space whenever the back-end
+# changes on main, creating the Space the first time. Needs, in the repository
+# settings (Settings > Secrets and variables > Actions):
+#   secret   HF_TOKEN             a Hugging Face access token with write permission
+# Optional variables:
+#   HF_SPACE              "your-user/name" (default: your-user/stitchlab-api)
+#   ALLOWED_ORIGINS       sites allowed to call the API, comma separated
+#   ALLOWED_ORIGIN_REGEX  pattern for allowed sites (default: this project's Vercel addresses)
+# Without the token the job says so and finishes.
 
 on:
   push:
@@ -12,6 +16,7 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/deploy-backend.yml"
+      - ".github/scripts/deploy_space.py"
   workflow_dispatch:
 
 concurrency:
@@ -24,12 +29,14 @@ jobs:
     env:
       HF_TOKEN: ${{ secrets.HF_TOKEN }}
       HF_SPACE: ${{ vars.HF_SPACE }}
+      ALLOWED_ORIGINS: ${{ vars.ALLOWED_ORIGINS }}
+      ALLOWED_ORIGIN_REGEX: ${{ vars.ALLOWED_ORIGIN_REGEX }}
     steps:
       - name: Check the settings
         id: check
         run: |
-          if [ -z "$HF_TOKEN" ] || [ -z "$HF_SPACE" ]; then
-            echo "HF_TOKEN or HF_SPACE is not set, so nothing was deployed."
+          if [ -z "$HF_TOKEN" ]; then
+            echo "The HF_TOKEN secret is not set, so nothing was deployed."
             echo "ready=false" >> "$GITHUB_OUTPUT"
           else
             echo "ready=true" >> "$GITHUB_OUTPUT"
@@ -43,23 +50,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Upload backend/ to the Space
+      - name: Create the Space if needed and upload backend/
         if: steps.check.outputs.ready == 'true'
         run: |
           pip install --quiet huggingface_hub
-          python - <<'PY'
-          import os
-          from huggingface_hub import HfApi
-
-          HfApi(token=os.environ["HF_TOKEN"]).upload_folder(
-              folder_path="backend",
-              repo_id=os.environ["HF_SPACE"],
-              repo_type="space",
-              commit_message="Deploy from GitHub: ${{ github.sha }}",
-              delete_patterns="*",
-              ignore_patterns=[
-                  ".venv/*", ".pytest_cache/*", "**/__pycache__/*", "tests/*",
-                  "pytest.ini", "requirements-dev.txt", ".env", ".env.*",
-              ],
-          )
-          PY
+          python .github/scripts/deploy_space.py

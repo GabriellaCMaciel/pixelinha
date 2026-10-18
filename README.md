@@ -281,9 +281,9 @@ stitchlab/
 
 ### Fase 4: PDF e deploy (~2 dias)
 - [x] Geração do PDF (grade paginada + legenda), com tecido, tamanho em cm e novelos
-- [ ] Dockerfile e deploy da API no Hugging Face Space
-- [ ] Deploy do front na Vercel
-- [ ] Variáveis de ambiente e CORS
+- [x] Dockerfile, CORS por variável de ambiente e automação do deploy da API (GitHub Actions → Hugging Face Space)
+- [ ] API no ar no Hugging Face Space
+- [ ] Front no ar na Vercel
 - [ ] Teste de ponta a ponta em produção
 
 ### Fase 5: Acabamento (~1–2 dias)
@@ -306,6 +306,24 @@ stitchlab/
 - Configurar CORS apenas para o domínio do front.
 - Nunca commitar chaves: usar variáveis de ambiente (`SUPABASE_URL`, `SUPABASE_KEY`, etc.).
 - Limites e regras de planos gratuitos mudam, então conferir na hora do deploy.
+
+### Como publicar (passo a passo)
+
+**1. API no Hugging Face (automático)**
+1. Crie uma conta em huggingface.co e, em *Settings → Access Tokens*, um token do tipo *Write*.
+2. No GitHub, em *Settings → Secrets and variables → Actions → New repository secret*, crie o segredo `HF_TOKEN` com esse token. Nunca cole o token em arquivos nem em conversas.
+3. Em *Actions → Deploy backend → Run workflow*. O script `.github/scripts/deploy_space.py` cria o Space `seu-usuario/stitchlab-api` (se não existir), define o CORS e envia a pasta `backend/`. Depois de alguns minutos de build, a API responde em `https://seu-usuario-stitchlab-api.hf.space/api/v1/health`.
+4. A partir daí, todo push em `main` que mexer em `backend/` publica de novo.
+
+Variáveis opcionais (aba *Variables*): `HF_SPACE` (outro nome de Space), `ALLOWED_ORIGINS` (sites extras, separados por vírgula) e `ALLOWED_ORIGIN_REGEX` (padrão: endereços `stitchlab*.vercel.app`).
+
+**2. Front na Vercel**
+1. Em vercel.com, *Add New → Project* e importe este repositório.
+2. Em *Root Directory*, escolha `frontend`.
+3. Em *Environment Variables*, crie `VITE_API_URL` com o endereço da API (passo 3 acima, sem a barra final) e faça o deploy.
+
+**3. Manter a API acordada (opcional)**
+Crie a variável `API_URL` no GitHub (o mesmo endereço da API). O workflow `keepalive.yml` chama `/api/v1/health` todo dia e evita que o Space durma.
 
 ## 14. Testes e qualidade
 
