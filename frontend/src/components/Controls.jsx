@@ -41,7 +41,7 @@ export default function Controls({ limits, values, onChange, disabled = false })
 
   return (
     <fieldset className="controls" disabled={disabled}>
-      <legend className="controls__title">Ajustes do gráfico</legend>
+      <legend className="visually-hidden">Ajustes do gráfico</legend>
 
       <Slider
         label="Largura"

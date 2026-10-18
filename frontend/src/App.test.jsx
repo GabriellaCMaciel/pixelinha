@@ -68,14 +68,14 @@ describe('App', () => {
     render(<App />)
 
     expect(screen.getByRole('heading', { name: 'PixeLinha' })).toBeInTheDocument()
-    await screen.findByRole('slider', { name: 'Largura' })
+    await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' })
   })
 
   it('tells the person it is connecting to the server', async () => {
     render(<App />)
 
     expect(screen.getByRole('status')).toHaveTextContent('Conectando ao servidor')
-    await screen.findByRole('slider', { name: 'Largura' })
+    await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' })
   })
 
   it('offers a retry when the server cannot be reached', async () => {
@@ -87,15 +87,29 @@ describe('App', () => {
 
     await user.click(screen.getByRole('button', { name: 'Tentar de novo' }))
 
-    expect(await screen.findByRole('slider', { name: 'Largura' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' })).toBeInTheDocument()
   })
 
   it('invites the person to pick an image before there is a chart', async () => {
     render(<App />)
 
-    expect(await screen.findByText('O gráfico aparece aqui')).toBeInTheDocument()
-    expect(screen.getByText(/As cores, os símbolos e a quantidade de pontos aparecem aqui/)).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Escolha a foto' })).toBeInTheDocument()
+    expect(screen.getByText('Escolha uma foto no passo 1 e o gráfico aparece aqui.')).toBeInTheDocument()
     expect(generateChart).not.toHaveBeenCalled()
+  })
+
+  it('shows only the first step until there is a photo', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('heading', { name: 'Escolha a foto' })
+
+    expect(screen.queryByRole('heading', { name: 'Ajuste do seu jeito' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Baixe e imprima' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Testar com uma imagem de exemplo' }))
+
+    expect(await screen.findByRole('heading', { name: 'Ajuste do seu jeito' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Baixe e imprima' })).toBeInTheDocument()
   })
 
   it('makes a chart from the example image', async () => {
@@ -162,8 +176,11 @@ describe('App', () => {
     expect(screen.getByRole('img')).toBeInTheDocument()
   })
 
-  it('keeps the PDF button locked until there is a chart', async () => {
+  it('keeps the PDF button locked while the chart is loading', async () => {
+    const user = userEvent.setup()
+    generateChart.mockReturnValue(new Promise(() => {}))
     render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
 
     expect(await screen.findByRole('button', { name: 'Baixar PDF' })).toBeDisabled()
   })
