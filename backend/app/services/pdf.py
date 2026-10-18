@@ -318,10 +318,11 @@ class _Document:
                 PAGE_W / 2, y0 - 4.5 * mm, "Os números mostram em que página está cada parte do gráfico."
             )
 
-        self._facts(y0 - 14 * mm)
+        y = self._facts(y0 - 14 * mm)
+        self._tips(y - 9 * mm)
         self._finish_page()
 
-    def _facts(self, y: float) -> None:
+    def _facts(self, y: float) -> float:
         c = self.canvas
         chart = self.chart
         width_cm, height_cm = size_cm(chart.width, chart.height, self.fabric_count)
@@ -363,6 +364,33 @@ class _Document:
             y - 2 * mm,
             f"Cruz inteira com {DEFAULT_STRANDS} fios. A quantidade de novelos é uma estimativa, com folga para as pontas.",
         )
+        return y - 2 * mm
+
+    def _tips(self, y: float) -> None:
+        c = self.canvas
+        c.setFont(FONT_BOLD, 11)
+        c.setFillColorRGB(*INK)
+        c.drawString(MARGIN, y, "Como ler o gráfico")
+        y -= 3 * mm
+        c.setStrokeColorRGB(*BLOSSOM)
+        c.setLineWidth(1.5)
+        c.line(MARGIN, y, MARGIN + 28 * mm, y)
+        y -= 6 * mm
+
+        tips = [
+            "Cada quadrado é uma cruz. O símbolo mostra qual linha usar: veja a legenda.",
+            "As linhas grossas marcam grupos de 10 pontos e ajudam a contar sem se perder.",
+            "Os triângulos nas bordas apontam o centro do gráfico. Começar pelo meio ajuda a centralizar.",
+            "Quadrados sem símbolo ficam sem ponto: é o tecido aparecendo.",
+            "Faça todas as cruzes no mesmo sentido, para o bordado ficar uniforme.",
+        ]
+        c.setFont(FONT, 9)
+        for tip in tips:
+            c.setFillColorRGB(*BLOSSOM)
+            c.drawString(MARGIN, y, "•")
+            c.setFillColorRGB(*INK)
+            c.drawString(MARGIN + 4 * mm, y, tip)
+            y -= 5.4 * mm
 
     # -- legend -------------------------------------------------------------
 
