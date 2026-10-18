@@ -242,7 +242,7 @@ stitchlab/
 ### Fase 1: Motor do ponto cruz (~2–3 dias)
 - [x] Redimensionar mantendo a proporção
 - [x] Quantização com k-means em Lab
-- [ ] Casamento com o DMC e fusão de duplicatas
+- [x] Casamento com o DMC e fusão de duplicatas
 - [ ] Símbolos e contagem de pontos
 - [ ] Rota `POST /cross-stitch/preview`
 - [ ] Testes unitários do módulo
