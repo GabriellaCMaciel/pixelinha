@@ -256,11 +256,11 @@ stitchlab/
 - [x] Testes unitários do módulo
 
 ### Fase 2: Front-end do editor (~2–3 dias)
-- [ ] Upload e controles (sliders)
-- [ ] Renderização da grade (canvas) com zoom e rolagem
-- [ ] Legenda com símbolos, códigos e contagens
-- [ ] Estados de carregamento e de erro
-- [ ] Layout responsivo
+- [x] Upload (arrastar e soltar, com imagem de exemplo) e controles (sliders, fundo sem ponto)
+- [x] Renderização da grade (canvas) com zoom e rolagem
+- [x] Legenda com símbolos, códigos e contagens (clicar numa linha destaca a cor no gráfico)
+- [x] Estados de carregamento e de erro
+- [x] Layout responsivo
 
 ### Fase 3: Login e projetos (~2 dias)
 - [ ] Cadastro e login com Supabase Auth
