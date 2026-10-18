@@ -2,12 +2,17 @@ import { textColorFor } from '../lib/chartRender.js'
 import './Legend.css'
 
 const number = new Intl.NumberFormat('pt-BR')
+const centimeters = new Intl.NumberFormat('pt-BR', {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+})
 
 /**
  * Thread list for the chart. Picking a row highlights that thread in the viewer.
  */
 export default function Legend({ chart, highlight = null, onHighlight }) {
-  const { colors, total_stitches: total, background } = chart
+  const { colors, total_stitches: total, background, fabric } = chart
+  const totalSkeins = colors.reduce((sum, color) => sum + color.skeins, 0)
 
   return (
     <section className="legend" aria-label="Legenda de linhas">
@@ -17,6 +22,12 @@ export default function Legend({ chart, highlight = null, onHighlight }) {
           {number.format(total)} {total === 1 ? 'ponto' : 'pontos'} em {colors.length}{' '}
           {colors.length === 1 ? 'cor' : 'cores'}
         </p>
+        {fabric && (
+          <p className="legend__size">
+            Pronto em Aida {fabric.count}: {centimeters.format(fabric.width_cm)} ×{' '}
+            {centimeters.format(fabric.height_cm)} cm
+          </p>
+        )}
       </header>
 
       <hr className="stitch-rule" />
@@ -43,12 +54,21 @@ export default function Legend({ chart, highlight = null, onHighlight }) {
                   <span className="legend__code">DMC {color.code}</span>
                   <span className="legend__label">{color.name}</span>
                 </span>
-                <span className="legend__count">{number.format(color.count)}</span>
+                <span className="legend__count">
+                  {number.format(color.count)}
+                  <span className="legend__skeins">
+                    {color.skeins} {color.skeins === 1 ? 'novelo' : 'novelos'}
+                  </span>
+                </span>
               </button>
             </li>
           )
         })}
       </ul>
+
+      <p className="legend__skein-total">
+        Estimativa: {totalSkeins} {totalSkeins === 1 ? 'novelo' : 'novelos'} no total
+      </p>
 
       {background && (
         <p className="legend__background">

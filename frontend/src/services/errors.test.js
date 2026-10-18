@@ -44,6 +44,8 @@ describe('describeError', () => {
     'unsupported_format',
     'corrupted_image',
     'background_not_in_palette',
+    'invalid_fabric_count',
+    'invalid_style',
     'server',
   ])('has a message for %s', (code) => {
     const message = describeError(error(code))

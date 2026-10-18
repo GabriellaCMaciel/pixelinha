@@ -12,6 +12,10 @@ export function describeError(error) {
       return `A largura precisa ficar entre ${details.min} e ${details.max} pontos.`
     case 'invalid_colors':
       return `O número de cores precisa ficar entre ${details.min} e ${details.max}.`
+    case 'invalid_fabric_count':
+      return 'Esse tecido não está disponível. Escolha uma das contagens da lista.'
+    case 'invalid_style':
+      return 'Esse estilo de PDF não existe. Escolha colorido ou preto e branco.'
     case 'file_too_large':
       return `O arquivo passa de ${Math.round(details.max_bytes / MB)} MB. Escolha uma imagem menor.`
     case 'image_too_large':

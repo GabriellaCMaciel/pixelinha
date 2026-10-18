@@ -3,8 +3,15 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import Controls from './Controls.jsx'
 
-const limits = { min_grid_width: 10, max_grid_width: 300, min_colors: 1, max_colors: 40 }
-const values = { gridWidth: 100, nColors: 16, ignoreBackground: false }
+const limits = {
+  min_grid_width: 10,
+  max_grid_width: 300,
+  min_colors: 1,
+  max_colors: 40,
+  fabric_counts: [11, 14, 16, 18, 20, 22],
+  default_fabric_count: 14,
+}
+const values = { gridWidth: 100, nColors: 16, ignoreBackground: false, fabricCount: 14 }
 
 describe('Controls', () => {
   it('uses the server limits for the sliders', () => {
@@ -46,6 +53,31 @@ describe('Controls', () => {
     expect(onChange).toHaveBeenCalledWith({ nColors: 8 })
   })
 
+  it('offers the fabric counts from the server', () => {
+    render(<Controls limits={limits} values={values} onChange={() => {}} />)
+
+    const select = screen.getByRole('combobox', { name: 'Tecido' })
+    expect(select).toHaveValue('14')
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Aida 11',
+      'Aida 14',
+      'Aida 16',
+      'Aida 18',
+      'Aida 20',
+      'Aida 22',
+    ])
+  })
+
+  it('reports the chosen fabric count as a number', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<Controls limits={limits} values={values} onChange={onChange} />)
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Tecido' }), '18')
+
+    expect(onChange).toHaveBeenCalledWith({ fabricCount: 18 })
+  })
+
   it('toggles the unstitched background', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
@@ -67,5 +99,6 @@ describe('Controls', () => {
 
     expect(screen.getByRole('slider', { name: 'Largura' })).toBeDisabled()
     expect(screen.getByRole('checkbox')).toBeDisabled()
+    expect(screen.getByRole('combobox', { name: 'Tecido' })).toBeDisabled()
   })
 })
