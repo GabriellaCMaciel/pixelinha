@@ -1,22 +1,31 @@
 /*
-  StitchLab design tokens.
-  Chrome is aubergine-black with gold thread; the chart itself sits on a light
-  linen surface so thread colors are shown true to life.
+  StitchLab design tokens: "Petal Dream".
+  Six flower colors plus one deep plum for text. Pastels carry the mood; plum
+  carries the reading. Chart threads always sit on light fabric so their colors
+  stay true.
 */
 :root {
-  --ink: #12081c;
-  --velvet: #1d0f2e;
-  --velvet-raised: #281540;
-  --orchid: #4a2d73;
-  --orchid-soft: #7a58b0;
-  --gold: #e2b54e;
-  --gold-deep: #b88a2b;
-  --linen: #f4efe7;
-  --linen-line: #e3dacb;
-  --text: #f1eaf9;
-  --text-muted: #ac9dc6;
-  --danger: #ff8fa3;
-  --success: #8fd9a8;
+  /* The palette */
+  --blossom: #e78faf;
+  --peony: #f2c1d6;
+  --coral: #f4a77c;
+  --leaf: #c6d67a;
+  --honey: #f4d56b;
+  --dawn: #f6f1e6;
+
+  /* Washes: the palette thinned out for large surfaces */
+  --paper: #fffbf4;
+  --peony-wash: #f9deea;
+  --honey-wash: #fbeab4;
+  --leaf-wash: #e7eec2;
+  --coral-wash: #fbdac7;
+
+  /* Text and lines */
+  --plum: #3b1830;
+  --plum-soft: #6b4a5e;
+  --berry: #a6406f;
+  --leaf-deep: #8ea63a;
+  --stitch-line: #b24577;
 
   --font-display: 'Gloock', 'Iowan Old Style', Georgia, serif;
   --font-body: 'Hanken Grotesk Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -25,13 +34,15 @@
   --step-0: 1rem;
   --step-1: 1.125rem;
   --step-2: 1.5rem;
-  --step-3: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+  --step-3: clamp(2.25rem, 1.6rem + 3vw, 3.75rem);
 
-  --radius-control: 8px;
-  --radius-panel: 14px;
+  /* Shapes differ on purpose: big soft patches, smaller controls, round pills. */
+  --radius-patch: 24px;
+  --radius-control: 12px;
+  --radius-pill: 999px;
   --gutter: clamp(1rem, 3vw, 2rem);
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 *,
@@ -47,8 +58,10 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--ink);
-  color: var(--text);
+  background-color: var(--dawn);
+  /* A faint field of tiny cross stitches, like fabric under the page. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M11 11l6 6M17 11l-6 6' stroke='%23e78faf' stroke-opacity='.16' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  color: var(--plum);
   font-family: var(--font-body);
   font-size: var(--step-0);
   line-height: 1.55;
@@ -81,7 +94,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 3px solid var(--plum);
   outline-offset: 2px;
 }
 
@@ -97,16 +110,27 @@ button {
   border: 0;
 }
 
-/* A line of running stitch: the divider used across the interface. */
+/* A line of running stitch in the flower colors: the divider used across the interface. */
 .stitch-rule {
-  height: 2px;
+  width: 100%;
+  height: 4px;
+  margin: 0;
   border: 0;
-  background-image: repeating-linear-gradient(
+  border-radius: 2px;
+  background-image: linear-gradient(
     90deg,
-    var(--gold) 0 10px,
-    transparent 10px 18px
+    var(--blossom) 0 14px,
+    transparent 14px 22px,
+    var(--coral) 22px 36px,
+    transparent 36px 44px,
+    var(--honey) 44px 58px,
+    transparent 58px 66px,
+    var(--leaf) 66px 80px,
+    transparent 80px 88px,
+    var(--peony) 88px 102px,
+    transparent 102px 110px
   );
-  opacity: 0.85;
+  background-size: 110px 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -118,4 +142,34 @@ button {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Shared pill button. Honey by default, coral when hovered. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.15rem;
+  border: 2px solid var(--plum);
+  border-radius: var(--radius-pill);
+  background: var(--honey);
+  color: var(--plum);
+  font-size: var(--step--1);
+  font-weight: 700;
+  line-height: 1.2;
+  transition: background-color 120ms ease, transform 120ms ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--coral);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  cursor: default;
+  opacity: 0.5;
 }

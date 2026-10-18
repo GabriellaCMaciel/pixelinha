@@ -14,8 +14,8 @@ import {
 
 describe('textColorFor', () => {
   it('uses dark text on light colors and light text on dark colors', () => {
-    expect(textColorFor([255, 255, 255])).toBe('#12081c')
-    expect(textColorFor([255, 230, 0])).toBe('#12081c')
+    expect(textColorFor([255, 255, 255])).toBe('#3b1830')
+    expect(textColorFor([255, 230, 0])).toBe('#3b1830')
     expect(textColorFor([0, 0, 0])).toBe('#ffffff')
     expect(textColorFor([0, 0, 160])).toBe('#ffffff')
   })
@@ -245,8 +245,8 @@ describe('drawChart', () => {
     drawChart(ctx, smallChart(), view({ cell: 20 }))
 
     const styles = ctx.strokes.map((stroke) => stroke.style)
-    expect(styles).toContain('rgba(29, 15, 46, 0.16)')
-    expect(styles).toContain('#b88a2b')
+    expect(styles).toContain('rgba(59, 24, 48, 0.16)')
+    expect(styles).toContain('#b24577')
   })
 
   it('keeps only the gold guides when zoomed far out', () => {
@@ -254,7 +254,7 @@ describe('drawChart', () => {
 
     drawChart(ctx, smallChart(), view({ cell: 4 }))
 
-    expect(ctx.strokes.every((stroke) => stroke.style === '#b88a2b')).toBe(true)
+    expect(ctx.strokes.every((stroke) => stroke.style === '#b24577')).toBe(true)
   })
 
   it('scales the drawing for high-density screens', () => {

@@ -1,0 +1,36 @@
+.flower {
+  display: block;
+  flex: none;
+  overflow: visible;
+}
+
+.flower__cross {
+  fill: none;
+  stroke-width: 0.26;
+  stroke-linecap: round;
+}
+
+/* One full round of stitching every few seconds, cross after cross. */
+.flower--stitching .flower__cross {
+  animation: stitch 3.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 28ms);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes stitch {
+  0%,
+  8% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  22%,
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
