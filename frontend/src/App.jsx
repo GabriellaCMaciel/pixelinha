@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Controls from './components/Controls.jsx'
 import GridViewer from './components/GridViewer.jsx'
 import Legend from './components/Legend.jsx'
+import StitchFlower from './components/StitchFlower.jsx'
 import Uploader from './components/Uploader.jsx'
 import { useChart } from './hooks/useChart.js'
 import { useLimits } from './hooks/useLimits.js'
@@ -12,12 +13,21 @@ const DEFAULTS = { gridWidth: 100, nColors: 16, ignoreBackground: false }
 
 const within = (value, low, high) => Math.min(high, Math.max(low, value))
 
-function Notice({ role = 'status', children, action }) {
+function Notice({ role = 'status', children, action, waiting = false }) {
   return (
     <div className="notice" role={role}>
-      <p>{children}</p>
+      {waiting && <StitchFlower size={44} stitching />}
+      <p className="notice__text">{children}</p>
       {action}
     </div>
+  )
+}
+
+function RetryButton({ onClick }) {
+  return (
+    <button type="button" className="btn" onClick={onClick}>
+      Tentar de novo
+    </button>
   )
 }
 
@@ -54,11 +64,7 @@ function Workspace({ limits }) {
         {status === 'error' && (
           <Notice
             role="alert"
-            action={
-              <button type="button" className="notice__action" onClick={retry}>
-                Tentar de novo
-              </button>
-            }
+            action={<RetryButton onClick={retry} />}
           >
             {describeError(error)}
           </Notice>
@@ -70,11 +76,12 @@ function Workspace({ limits }) {
           <div className="empty" aria-live="polite">
             {loading ? (
               <>
-                <span className="empty__thread" aria-hidden="true" />
+                <StitchFlower size={120} stitching />
                 <p>Gerando o gráfico…</p>
               </>
             ) : (
               <>
+                <StitchFlower size={120} />
                 <h2 className="empty__title">O gráfico aparece aqui</h2>
                 <p>Escolha uma imagem ao lado, ou teste com a imagem de exemplo.</p>
               </>
@@ -89,15 +96,20 @@ function Workspace({ limits }) {
         )}
       </div>
 
-      {chart && (
-        <div className="workspace__legend">
+      <div className="workspace__legend">
+        {chart ? (
           <Legend
             chart={chart}
             highlight={highlight}
             onHighlight={(index) => setPicked(index === null ? null : { chart, index })}
           />
-        </div>
-      )}
+        ) : (
+          <section className="legend legend--empty" aria-label="Legenda de linhas">
+            <h2 className="legend__title">Linhas DMC</h2>
+            <p className="legend__total">As cores, os símbolos e a quantidade de pontos aparecem aqui.</p>
+          </section>
+        )}
+      </div>
     </main>
   )
 }
@@ -108,15 +120,20 @@ export default function App() {
   return (
     <div className="page">
       <header className="page__header">
-        <h1 className="page__title">StitchLab</h1>
-        <p className="page__tagline">Transforme qualquer imagem em gráfico de ponto cruz.</p>
+        <div className="page__brand">
+          <StitchFlower size={76} />
+          <div>
+            <h1 className="page__title">StitchLab</h1>
+            <p className="page__tagline">Transforme qualquer imagem em gráfico de ponto cruz.</p>
+          </div>
+        </div>
         <hr className="stitch-rule" />
       </header>
 
       {status === 'ready' && <Workspace limits={limits} />}
 
       {status === 'loading' && (
-        <Notice>
+        <Notice waiting>
           Conectando ao servidor… Na primeira visita do dia isso pode levar cerca de 1 minuto.
         </Notice>
       )}
@@ -124,11 +141,7 @@ export default function App() {
       {status === 'error' && (
         <Notice
           role="alert"
-          action={
-            <button type="button" className="notice__action" onClick={retry}>
-              Tentar de novo
-            </button>
-          }
+          action={<RetryButton onClick={retry} />}
         >
           {describeError(error)}
         </Notice>

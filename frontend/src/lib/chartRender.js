@@ -14,9 +14,9 @@ const GRID_MIN_CELL = 6
 const GUIDE_MIN_CELL = 3
 const GUIDE_EVERY = 10
 
-const LINEN = '#f4efe7'
-const THIN_LINE = 'rgba(29, 15, 46, 0.16)'
-const GUIDE_LINE = '#b88a2b'
+const FABRIC = '#f6f1e6'
+const THIN_LINE = 'rgba(59, 24, 48, 0.16)'
+const GUIDE_LINE = '#b24577'
 const DIMMED_ALPHA = 0.18
 
 export function clampCell(size) {
@@ -85,7 +85,7 @@ export function textColorFor([r, g, b]) {
     return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
   }
   const luminance = 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
-  return luminance > 0.179 ? '#12081c' : '#ffffff'
+  return luminance > 0.179 ? '#3b1830' : '#ffffff'
 }
 
 function strokeLines(ctx, positions, from, to, vertical) {
@@ -118,7 +118,7 @@ export function drawChart(ctx, chart, view) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   ctx.clearRect(0, 0, viewportW, viewportH)
   ctx.globalAlpha = 1
-  ctx.fillStyle = LINEN
+  ctx.fillStyle = FABRIC
   ctx.fillRect(0, 0, viewportW, viewportH)
 
   const origin = gridOrigin(cols, rows, cell, viewportW, viewportH)
