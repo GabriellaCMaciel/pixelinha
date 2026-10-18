@@ -134,10 +134,10 @@ describe('Controls: colors', () => {
     expect(onChange).toHaveBeenCalledWith({ nColors: 8 })
   })
 
-  it('always explains that few colors hurt detailed images', () => {
+  it('always recommends more colors for a more detailed result', () => {
     renderControls()
 
-    expect(screen.getByText(/imagem tiver muitos detalhes, usar poucas cores não dá um bom resultado/)).toBeInTheDocument()
+    expect(screen.getByText(/Para um resultado mais detalhado, recomendamos usar mais cores/)).toBeInTheDocument()
   })
 
   it('warns when there are few colors', () => {

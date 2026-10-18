@@ -138,7 +138,7 @@ export default function Controls({ limits, values, onChange, disabled = false })
 
       <Slider
         label="Cores"
-        hint="Menos cores deixam o bordado mais simples de executar. Mas se a imagem tiver muitos detalhes, usar poucas cores não dá um bom resultado."
+        hint="Menos cores deixam o bordado mais simples de executar. Para um resultado mais detalhado, recomendamos usar mais cores."
         value={values.nColors}
         min={limits.min_colors}
         max={limits.max_colors}
