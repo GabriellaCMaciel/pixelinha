@@ -84,6 +84,7 @@ describe('App', () => {
     render(<App />)
 
     expect(await screen.findByText('O gráfico aparece aqui')).toBeInTheDocument()
+    expect(screen.getByText(/As cores, os símbolos e a quantidade de pontos aparecem aqui/)).toBeInTheDocument()
     expect(generateChart).not.toHaveBeenCalled()
   })
 
