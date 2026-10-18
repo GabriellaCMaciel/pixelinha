@@ -153,7 +153,11 @@ Entrada: imagem + `largura_grade`, `n_cores`, parâmetros opcionais. Saída: gra
 
 **Opções a avaliar nos testes:** suavização antes da quantização (ex.: filtro bilateral), tamanho mínimo de "mancha" de cor para evitar pontos soltos e opção de ignorar o fundo.
 
-**Estimativa de linha (RF11, baixa prioridade):** a quantidade de fio depende da contagem do tecido e do número de fios usados. A fórmula será definida e documentada na fase correspondente, em vez de fixar números agora.
+**Tamanho e estimativa de linha (RF11):** feitos em `services/estimate.py`, para tecido Aida de 11 a 22 pontos por polegada (padrão 14).
+- **Tamanho:** cada ponto mede `2,54 cm ÷ contagem`. A largura em cm é a largura do gráfico vezes isso.
+- **Linha por cruz** (para um fio): duas diagonais na frente (`2 × √2`) mais cerca de dois lados de caminho no verso, tudo em múltiplos do lado do ponto. Multiplica pelo número de fios (padrão 2) e por 1,5 de folga para as pontas e sobras.
+- **Novelos:** um novelo DMC tem 8 m e 6 fios (4.800 cm de fio). Divide-se o fio necessário por isso e arredonda-se para cima; toda cor usada pede pelo menos 1 novelo. Em Aida 14 com 2 fios, 1 novelo rende cerca de 1.800 pontos.
+- É uma **estimativa para planejar**, sempre inclinada a sobrar um pouco, e é dita assim na legenda e no PDF.
 
 ## 8. Modelo de dados
 
@@ -187,7 +191,8 @@ Prefixo `/api/v1`. Rotas protegidas exigem o token do Supabase no cabeçalho `Au
 | GET | `/projects` | sim | Lista os projetos da usuária |
 | GET | `/projects/{id}` | sim | Abre um projeto |
 | DELETE | `/projects/{id}` | sim | Exclui um projeto |
-| GET | `/projects/{id}/pdf` | sim | Gera e devolve o PDF do projeto |
+| POST | `/cross-stitch/pdf` | não | Mesmos dados do preview + tecido, título e estilo; devolve o PDF para baixar |
+| GET | `/projects/{id}/pdf` | sim | Gera e devolve o PDF de um projeto salvo |
 
 **Erros padronizados:** `400` (imagem corrompida), `401` (sem login), `404` (não encontrado), `413` (arquivo ou imagem grande demais), `415` (formato não suportado), `422` (parâmetros fora dos limites ou gráfico grande demais para a imagem).
 
@@ -196,6 +201,12 @@ O corpo dos erros segue o formato `{"detail": {"code": "...", "message": "...", 
 **`POST /cross-stitch/preview`:** recebe `multipart/form-data` com `image` (arquivo) e, opcionalmente, `grid_width` (padrão 100), `n_colors` (padrão 16), `ignore_background` (padrão falso) e `background_code` (código DMC de uma cor do gráfico para deixar sem ponto). Devolve `width`, `height`, `total_stitches` (só os pontos a bordar), `colors` (código DMC, nome, hex, rgb, símbolo e contagem), `grid` (matriz com o índice da cor de cada ponto, ou `-1` para uma célula sem ponto) e `background` (a linha ignorada e quantas células ela cobre, ou `null`).
 
 Erros extras desse recurso (`422`): `nothing_to_stitch` (só sobrou fundo) e `background_not_in_palette` (a resposta traz as linhas disponíveis em `available`).
+
+**Tecido e novelos:** o preview também aceita `fabric_count` (contagem Aida, padrão 14) e devolve `fabric` (`count`, `width_cm`, `height_cm`) e, em cada cor, `skeins` (novelos estimados). Uma contagem fora da lista dá `422 invalid_fabric_count`, com as opções em `allowed`. O `GET /limits` lista as contagens em `fabric_counts` e `default_fabric_count`.
+
+**`POST /cross-stitch/pdf`:** recebe os mesmos campos do preview e mais `title` (opcional, até 60 caracteres) e `style` (`color`, padrão, ou `bw`). Gera o gráfico do mesmo jeito que o preview e devolve `application/pdf` como download (`Content-Disposition: attachment`, com o nome feito a partir do título). Estilo inválido dá `422 invalid_style`. Os demais erros são os do preview.
+
+**O PDF** (ReportLab, A4, em português) tem: capa com a prévia do gráfico (com o número da página de cada parte), tamanho, tecido sugerido e dicas de leitura; legenda com símbolo, código DMC, nome, pontos e novelos por cor; e o gráfico em páginas de 40 × 60 pontos, com números de linhas e colunas, linhas grossas a cada 10 pontos (alinhadas entre as páginas) e setas no centro. As fontes DejaVu Sans vão junto no repositório para todos os símbolos saírem na impressão.
 
 ## 10. Telas
 
@@ -269,7 +280,7 @@ stitchlab/
 - [ ] Telas "Meus projetos" e detalhe
 
 ### Fase 4: PDF e deploy (~2 dias)
-- [ ] Geração do PDF (grade paginada + legenda)
+- [x] Geração do PDF (grade paginada + legenda), com tecido, tamanho em cm e novelos
 - [ ] Dockerfile e deploy da API no Hugging Face Space
 - [ ] Deploy do front na Vercel
 - [ ] Variáveis de ambiente e CORS
@@ -325,7 +336,7 @@ stitchlab/
 | Imagens grandes travando o servidor | Limites de tamanho e de grade, mais timeout |
 | Armazenamento limitado no plano gratuito | Limitar o tamanho das imagens e apagar arquivos órfãos |
 
-**Decisões em aberto:** nome definitivo do projeto, conjunto final de símbolos, se visitantes poderão baixar o PDF sem login, e a identidade visual.
+**Decisões em aberto:** nome definitivo do projeto e conjunto final de símbolos. Decidido por enquanto: visitantes **podem** baixar o PDF sem login (se isso mudar, é só proteger a rota). A identidade visual é a paleta Petal Dream.
 
 ## 17. Pós-MVP
 
@@ -353,6 +364,7 @@ Para rodar na própria máquina, veja `backend/` (FastAPI) e `frontend/README.md
 ## Créditos
 
 - **Cores DMC:** Color data: craft-color-codes by [MakeBead](https://makebead.com), licenciado sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Mais detalhes em `backend/app/data/README.md`.
+- **Fonte do PDF:** DejaVu Sans (Bitstream Vera, com alterações em domínio público). A licença está em `backend/app/data/fonts/LICENSE-DejaVu.txt`.
 - DMC é uma marca registrada de seu titular. Este projeto não é afiliado nem endossado pela DMC.
 
 ---

@@ -13,7 +13,7 @@ export const DEBOUNCE_MS = 350
  *
  * status is 'idle' (no image), 'loading', 'ready' or 'error'.
  */
-export function useChart({ file, gridWidth, nColors, ignoreBackground }) {
+export function useChart({ file, gridWidth, nColors, ignoreBackground, fabricCount }) {
   const [attempt, setAttempt] = useState(0)
   const [result, setResult] = useState({ request: null, chart: null, error: null })
   const lastFile = useRef(null)
@@ -21,8 +21,8 @@ export function useChart({ file, gridWidth, nColors, ignoreBackground }) {
   // A new object for every combination of inputs: an answer belongs to the
   // request that produced it, which is how we know whether it is still current.
   const request = useMemo(
-    () => (file ? { file, gridWidth, nColors, ignoreBackground, attempt } : null),
-    [file, gridWidth, nColors, ignoreBackground, attempt],
+    () => (file ? { file, gridWidth, nColors, ignoreBackground, fabricCount, attempt } : null),
+    [file, gridWidth, nColors, ignoreBackground, fabricCount, attempt],
   )
 
   useEffect(() => {
