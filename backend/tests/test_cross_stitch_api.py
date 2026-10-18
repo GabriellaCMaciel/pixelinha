@@ -207,3 +207,77 @@ def test_the_same_upload_gives_the_same_chart(client):
     second = post(client, data, grid_width=20, n_colors=4).json()
 
     assert first == second
+
+
+def drawing() -> Image.Image:
+    """A red square on a white background."""
+    pixels = np.full((80, 80, 3), 255, dtype=np.uint8)
+    pixels[20:60, 20:60] = (255, 0, 0)
+    return Image.fromarray(pixels)
+
+
+def test_the_background_is_stitched_by_default(client):
+    body = post(client, encode(drawing()), grid_width=20, n_colors=2).json()
+
+    assert body["background"] is None
+    assert body["total_stitches"] == 400
+    assert all(index >= 0 for row in body["grid"] for index in row)
+
+
+def test_ignoring_the_background_leaves_those_cells_empty(client):
+    response = post(
+        client, encode(drawing()), grid_width=20, n_colors=2, ignore_background="true"
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["colors"]) == 1
+    assert body["colors"][0]["count"] == 100
+    assert body["total_stitches"] == 100
+    assert body["background"]["count"] == 300
+    assert set(body["background"]) == {"code", "name", "hex", "rgb", "count"}
+    flat = [index for row in body["grid"] for index in row]
+    assert flat.count(-1) == 300
+    assert flat.count(0) == 100
+
+
+def test_a_chosen_thread_can_be_left_unstitched(client):
+    plain = post(client, encode(drawing()), grid_width=20, n_colors=2).json()
+    red_code = plain["colors"][1]["code"]
+
+    response = post(
+        client, encode(drawing()), grid_width=20, n_colors=2, background_code=red_code
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["background"]["code"] == red_code
+    assert body["background"]["count"] == 100
+    assert body["colors"][0]["count"] == 300
+
+
+def test_an_empty_background_code_is_ignored(client):
+    body = post(client, encode(drawing()), grid_width=20, n_colors=2, background_code="").json()
+
+    assert body["background"] is None
+    assert body["total_stitches"] == 400
+
+
+def test_an_unknown_background_thread_lists_the_available_ones(client):
+    response = post(
+        client, encode(drawing()), grid_width=20, n_colors=2, background_code="NOPE"
+    )
+
+    assert response.status_code == 422
+    detail = error_of(response)
+    assert detail["code"] == "background_not_in_palette"
+    assert len(detail["available"]) == 2
+
+
+def test_a_single_color_with_the_background_ignored_has_nothing_to_stitch(client):
+    response = post(
+        client, encode(drawing()), grid_width=20, n_colors=1, ignore_background="true"
+    )
+
+    assert response.status_code == 422
+    assert error_of(response)["code"] == "nothing_to_stitch"

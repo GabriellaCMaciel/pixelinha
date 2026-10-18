@@ -14,11 +14,21 @@ class ChartColorOut(BaseModel):
     count: int
 
 
+class ChartBackgroundOut(BaseModel):
+    code: str
+    name: str
+    hex: str
+    rgb: tuple[int, int, int]
+    count: int
+
+
 class CrossStitchPreview(BaseModel):
     """Chart returned to the front-end.
 
     `grid` has `height` rows of `width` numbers, each one the index of the
-    stitch color in `colors`.
+    stitch color in `colors`, or -1 for a cell left without a stitch.
+    `total_stitches` counts only the stitched cells. When the background is
+    ignored, `background` tells which thread it was and how many cells it covers.
     """
 
     width: int
@@ -26,6 +36,7 @@ class CrossStitchPreview(BaseModel):
     total_stitches: int
     colors: list[ChartColorOut]
     grid: list[list[int]]
+    background: ChartBackgroundOut | None = None
 
     @classmethod
     def from_chart(cls, chart: CrossStitchChart) -> "CrossStitchPreview":
@@ -35,4 +46,9 @@ class CrossStitchPreview(BaseModel):
             total_stitches=chart.total_stitches,
             colors=[ChartColorOut(**asdict(color)) for color in chart.colors],
             grid=chart.grid.tolist(),
+            background=(
+                ChartBackgroundOut(**asdict(chart.background))
+                if chart.background is not None
+                else None
+            ),
         )
