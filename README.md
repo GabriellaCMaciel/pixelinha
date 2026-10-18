@@ -233,9 +233,9 @@ stitchlab/
 > As estimativas assumem algumas horas por dia e podem encurtar conforme o ritmo. Cada fase termina com algo funcionando e commitado.
 
 ### Fase 0: Preparação (~1 dia)
-- [ ] Criar o repositório e a estrutura de pastas
-- [ ] Projeto base do FastAPI com `/health`
-- [ ] Projeto base do React (Vite)
+- [x] Criar o repositório e a estrutura de pastas
+- [x] Projeto base do FastAPI com `/health`
+- [x] Projeto base do React (Vite)
 - [ ] Criar projeto no Supabase
 - [ ] Obter e organizar a tabela DMC (conferir a licença da fonte)
 
