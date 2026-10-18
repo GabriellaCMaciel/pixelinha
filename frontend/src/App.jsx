@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Controls from './components/Controls.jsx'
 import GridViewer from './components/GridViewer.jsx'
 import Legend from './components/Legend.jsx'
+import PdfExport from './components/PdfExport.jsx'
 import StitchFlower from './components/StitchFlower.jsx'
 import Uploader from './components/Uploader.jsx'
 import { useChart } from './hooks/useChart.js'
@@ -61,6 +62,7 @@ function Workspace({ limits }) {
           values={values}
           onChange={(change) => setSettings((previous) => ({ ...previous, ...change }))}
         />
+        <PdfExport file={file} settings={values} ready={status === 'ready'} />
       </aside>
 
       <div className="workspace__stage">
