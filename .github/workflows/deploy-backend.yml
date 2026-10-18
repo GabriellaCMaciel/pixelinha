@@ -1,0 +1,65 @@
+name: Deploy back-end
+
+# Sends the backend/ folder to the Hugging Face Space whenever the back-end
+# changes on main. Needs, in the repository settings:
+#   secret   HF_TOKEN  a Hugging Face access token with write permission
+#   variable HF_SPACE  the Space, like "your-user/stitchlab-api"
+# Without them the job just says so and finishes.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_SPACE: ${{ vars.HF_SPACE }}
+    steps:
+      - name: Check the settings
+        id: check
+        run: |
+          if [ -z "$HF_TOKEN" ] || [ -z "$HF_SPACE" ]; then
+            echo "HF_TOKEN or HF_SPACE is not set, so nothing was deployed."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.check.outputs.ready == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.check.outputs.ready == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Upload backend/ to the Space
+        if: steps.check.outputs.ready == 'true'
+        run: |
+          pip install --quiet huggingface_hub
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          HfApi(token=os.environ["HF_TOKEN"]).upload_folder(
+              folder_path="backend",
+              repo_id=os.environ["HF_SPACE"],
+              repo_type="space",
+              commit_message="Deploy from GitHub: ${{ github.sha }}",
+              delete_patterns="*",
+              ignore_patterns=[
+                  ".venv/*", ".pytest_cache/*", "**/__pycache__/*", "tests/*",
+                  "pytest.ini", "requirements-dev.txt", ".env", ".env.*",
+              ],
+          )
+          PY
