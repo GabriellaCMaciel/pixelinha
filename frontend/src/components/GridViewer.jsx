@@ -154,17 +154,16 @@ export default function GridViewer({ chart, highlight = null, busy = false }) {
   return (
     <section className={`viewer${busy ? ' viewer--busy' : ''}`} aria-label="Gráfico">
       <div className="viewer__toolbar">
-        <div className="viewer__zoom" role="group" aria-label="Zoom">
+        <div className="viewer__zoom" role="group" aria-label="Aproximar ou afastar">
           <button
             type="button"
             className="viewer__button"
             onClick={() => zoomTo(zoomStep(cell, -1))}
             disabled={cell <= MIN_CELL}
-            aria-label="Diminuir zoom"
           >
-            −
+            <span aria-hidden="true">−</span> Afastar
           </button>
-          <output className="viewer__zoom-level" aria-label="Tamanho de cada ponto">
+          <output className="visually-hidden" aria-label="Tamanho de cada ponto">
             {cell} px
           </output>
           <button
@@ -172,9 +171,8 @@ export default function GridViewer({ chart, highlight = null, busy = false }) {
             className="viewer__button"
             onClick={() => zoomTo(zoomStep(cell, 1))}
             disabled={cell >= MAX_CELL}
-            aria-label="Aumentar zoom"
           >
-            +
+            <span aria-hidden="true">+</span> Aproximar
           </button>
           <button
             type="button"
@@ -182,7 +180,7 @@ export default function GridViewer({ chart, highlight = null, busy = false }) {
             onClick={() => setZoom(null)}
             disabled={fit}
           >
-            Ajustar à tela
+            Ver tudo
           </button>
         </div>
         <p className="viewer__hover" aria-hidden="true">
@@ -221,6 +219,10 @@ export default function GridViewer({ chart, highlight = null, busy = false }) {
           style={{ width: cols * cell, height: rows * cell }}
         />
       </div>
+
+      <p className="viewer__tip">
+        Aproxime para ver cada ponto. Arraste ou role para ver o resto do gráfico.
+      </p>
     </section>
   )
 }

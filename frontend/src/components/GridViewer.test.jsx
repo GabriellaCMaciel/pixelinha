@@ -61,7 +61,7 @@ describe('GridViewer', () => {
     render(<GridViewer chart={makeChart()} />)
 
     expect(screen.getByLabelText('Tamanho de cada ponto')).toHaveTextContent('7 px')
-    expect(screen.getByRole('button', { name: 'Ajustar à tela' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Ver tudo' })).toBeDisabled()
   })
 
   it('paints the visible cells on the canvas', () => {
@@ -75,20 +75,20 @@ describe('GridViewer', () => {
     render(<GridViewer chart={makeChart()} />)
     const level = screen.getByLabelText('Tamanho de cada ponto')
 
-    await user.click(screen.getByRole('button', { name: 'Aumentar zoom' }))
+    await user.click(screen.getByRole('button', { name: 'Aproximar' }))
     expect(level).toHaveTextContent('9 px')
 
-    await user.click(screen.getByRole('button', { name: 'Diminuir zoom' }))
-    await user.click(screen.getByRole('button', { name: 'Diminuir zoom' }))
+    await user.click(screen.getByRole('button', { name: 'Afastar' }))
+    await user.click(screen.getByRole('button', { name: 'Afastar' }))
     expect(level).toHaveTextContent('6 px')
   })
 
   it('goes back to the fitted size', async () => {
     const user = userEvent.setup()
     render(<GridViewer chart={makeChart()} />)
-    const fit = screen.getByRole('button', { name: 'Ajustar à tela' })
+    const fit = screen.getByRole('button', { name: 'Ver tudo' })
 
-    await user.click(screen.getByRole('button', { name: 'Aumentar zoom' }))
+    await user.click(screen.getByRole('button', { name: 'Aproximar' }))
     expect(fit).toBeEnabled()
 
     await user.click(fit)
@@ -100,14 +100,14 @@ describe('GridViewer', () => {
     render(<GridViewer chart={makeChart(300)} />)
 
     expect(screen.getByLabelText('Tamanho de cada ponto')).toHaveTextContent('2 px')
-    expect(screen.getByRole('button', { name: 'Diminuir zoom' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Afastar' })).toBeDisabled()
   })
 
   it('disables zoom in at the largest size', () => {
     render(<GridViewer chart={makeChart(4)} />)
 
     expect(screen.getByLabelText('Tamanho de cada ponto')).toHaveTextContent('48 px')
-    expect(screen.getByRole('button', { name: 'Aumentar zoom' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Aproximar' })).toBeDisabled()
   })
 
   it('zooms with the keyboard', async () => {
@@ -126,7 +126,7 @@ describe('GridViewer', () => {
     await user.keyboard('+')
     await user.keyboard('0')
     expect(level).toHaveTextContent('7 px')
-    expect(screen.getByRole('button', { name: 'Ajustar à tela' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Ver tudo' })).toBeDisabled()
   })
 
   it('tells which thread is under the pointer', () => {
@@ -172,12 +172,18 @@ describe('GridViewer', () => {
   it('fits again when a chart with other dimensions arrives', async () => {
     const user = userEvent.setup()
     const { rerender } = render(<GridViewer chart={makeChart(40)} />)
-    await user.click(screen.getByRole('button', { name: 'Aumentar zoom' }))
+    await user.click(screen.getByRole('button', { name: 'Aproximar' }))
 
     rerender(<GridViewer chart={makeChart(20)} />)
 
     expect(screen.getByLabelText('Tamanho de cada ponto')).toHaveTextContent('15 px')
-    expect(screen.getByRole('button', { name: 'Ajustar à tela' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Ver tudo' })).toBeDisabled()
+  })
+
+  it('explains how to look around the chart', () => {
+    render(<GridViewer chart={makeChart()} />)
+
+    expect(screen.getByText(/Arraste ou role para ver o resto do gráfico/)).toBeInTheDocument()
   })
 
   it('marks the viewer as busy while a new chart is loading', () => {
