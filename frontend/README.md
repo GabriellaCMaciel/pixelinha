@@ -1,16 +1,38 @@
-# React + Vite
+# StitchLab: front-end
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite. The chart editor: upload an image, adjust size and colors,
+and see the cross-stitch chart with its DMC thread legend.
 
-Currently, two official plugins are available:
+## Running
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev      # http://localhost:5173
+```
 
-## React Compiler
+The API must be running on port 8000 (see `../backend`). In development Vite
+forwards `/api` to it, so no setup is needed. Copy `.env.example` to
+`.env.local` only when you need to change something.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Scripts
 
-## Expanding the Oxlint configuration
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server with hot reload |
+| `npm test` | Unit and component tests (Vitest) |
+| `npm run lint` | Lint (Oxlint) |
+| `npm run build` | Production build in `dist/` |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Structure
+
+```
+src/
+  components/   Uploader, Controls, GridViewer, Legend (each with CSS and tests)
+  hooks/        useChart (debounce, cancel, keep last chart), useLimits
+  lib/          Canvas drawing math and the sample image
+  services/     API client and Portuguese error messages
+  index.css     Design tokens and base styles
+```
+
+The chart is drawn on a canvas that paints only the visible cells, so a
+300 x 300 chart stays smooth at any zoom.
