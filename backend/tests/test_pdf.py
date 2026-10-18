@@ -117,6 +117,13 @@ def test_the_cover_shows_title_sizes_and_totals(chart):
     assert "Pontos para bordar" in text
 
 
+def test_the_cover_explains_how_to_read_the_chart(chart):
+    text = read(build_pdf(chart)).pages[0].extract_text()
+
+    assert "Como ler o gráfico" in text
+    assert "centro" in text
+
+
 def test_the_fabric_count_changes_the_printed_size(chart):
     text = read(build_pdf(chart, fabric_count=18)).pages[0].extract_text()
 
