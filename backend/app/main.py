@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import health
+from app.api import cross_stitch, health
 
 API_PREFIX = "/api/v1"
 
@@ -11,3 +11,4 @@ app = FastAPI(
 )
 
 app.include_router(health.router, prefix=API_PREFIX)
+app.include_router(cross_stitch.router, prefix=API_PREFIX)

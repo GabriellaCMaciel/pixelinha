@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from app.services.imaging import grid_size, resize_to_grid
+from app.services.imaging import grid_size, largest_grid_width, resize_to_grid
 
 
 def make_image(height: int, width: int, color=(0, 0, 0)) -> np.ndarray:
@@ -81,3 +81,33 @@ def test_resize_rejects_non_rgb_arrays():
 def test_resize_rejects_wrong_dtype():
     with pytest.raises(ValueError):
         resize_to_grid(np.zeros((10, 10, 3), dtype=np.float32), grid_width=5)
+
+
+@pytest.mark.parametrize(
+    ("width", "height", "max_stitches", "expected"),
+    [
+        (100, 100, 100, 10),
+        (400, 100, 200, 28),
+        (100, 400, 200, 7),
+        (1000, 1, 50, 50),
+    ],
+)
+def test_largest_grid_width_respects_the_stitch_limit(width, height, max_stitches, expected):
+    result = largest_grid_width(width, height, max_stitches)
+
+    assert result == expected
+    grid_w, grid_h = grid_size(width, height, result)
+    assert grid_w * grid_h <= max_stitches
+    if result > 1:
+        next_w, next_h = grid_size(width, height, result + 1)
+        assert next_w * next_h > max_stitches
+
+
+def test_largest_grid_width_is_at_least_one():
+    assert largest_grid_width(1, 10_000, 5) == 1
+
+
+@pytest.mark.parametrize("args", [(0, 10, 10), (10, 0, 10), (10, 10, 0)])
+def test_largest_grid_width_rejects_invalid_input(args):
+    with pytest.raises(ValueError):
+        largest_grid_width(*args)
