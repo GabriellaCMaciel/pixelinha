@@ -106,8 +106,9 @@
     gap: 0.35rem;
   }
 
+  /* Touch screens have no pointer to hover with. */
   .viewer__hover {
-    text-align: left;
+    display: none;
   }
 
   .viewer__scroller {
