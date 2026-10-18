@@ -47,7 +47,7 @@ def test_any_used_color_needs_at_least_one_skein():
     assert skeins_needed(50, 14) == 1
 
 
-def test_a_skein_covers_around_two_thousand_stitches_on_14_count():
+def test_a_skein_covers_around_eighteen_hundred_stitches_on_14_count():
     assert skeins_needed(1_500, 14) == 1
     assert skeins_needed(2_500, 14) == 2
     assert skeins_needed(5_000, 14) == 3
