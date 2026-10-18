@@ -320,7 +320,7 @@ pixelinha/
 **2. Front na Vercel**
 1. Em vercel.com, *Add New → Project* e importe este repositório.
 2. Em *Root Directory*, escolha `frontend`.
-3. Em *Environment Variables*, crie `VITE_API_URL` com o endereço da API (sem a barra final) e faça o deploy.
+3. Faça o deploy. O endereço da API já está em `frontend/.env.production` (`VITE_API_URL`); se a API mudar de endereço, edite esse arquivo (ou crie `VITE_API_URL` em *Settings → Environment Variables* na Vercel, que tem prioridade) e publique de novo.
 4. Se o endereço do site na Vercel não começar com `pixelinha` (por exemplo, o nome estava ocupado), ajuste `PIXELINHA_ALLOWED_ORIGIN_REGEX` no painel do Render (*Environment*) para incluir o endereço real.
 
 **3. Acordar a API (opcional)**
