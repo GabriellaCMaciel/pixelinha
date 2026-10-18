@@ -26,6 +26,8 @@ const limits = {
   min_colors: 1,
   max_colors: 40,
   max_stitches: 90_000,
+  fabric_counts: [11, 14, 16, 18, 20, 22],
+  default_fabric_count: 14,
 }
 
 function chartOf(width, extra = {}) {
@@ -33,8 +35,9 @@ function chartOf(width, extra = {}) {
     width,
     height: width,
     total_stitches: width * width,
+    fabric: { count: 14, width_cm: 10, height_cm: 10 },
     colors: [
-      { code: '310', name: 'Black', hex: '#000000', rgb: [0, 0, 0], symbol: '●', count: width * width },
+      { code: '310', name: 'Black', hex: '#000000', rgb: [0, 0, 0], symbol: '●', count: width * width, skeins: 2 },
     ],
     grid: Array.from({ length: width }, () => Array(width).fill(0)),
     background: null,
@@ -110,6 +113,19 @@ describe('App', () => {
     await waitFor(() => expect(generateChart).toHaveBeenCalledTimes(2))
     expect(generateChart.mock.calls[1][0].gridWidth).toBe(60)
     expect(await screen.findByRole('img', { name: /60 por 60/ })).toBeInTheDocument()
+  })
+
+  it('asks again with the chosen fabric', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
+    await screen.findByRole('img')
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Tecido' }), '18')
+
+    await waitFor(() => expect(generateChart).toHaveBeenCalledTimes(2))
+    expect(generateChart.mock.calls[0][0].fabricCount).toBe(14)
+    expect(generateChart.mock.calls[1][0].fabricCount).toBe(18)
   })
 
   it('sends the unstitched background option', async () => {

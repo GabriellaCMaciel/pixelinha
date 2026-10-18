@@ -30,7 +30,7 @@ async function toApiError(response) {
   return new ApiError({ status: response.status, code })
 }
 
-async function request(path, options) {
+async function send(path, options) {
   let response
   try {
     response = await fetch(`${API_BASE}${PREFIX}${path}`, options)
@@ -40,7 +40,30 @@ async function request(path, options) {
   }
 
   if (!response.ok) throw await toApiError(response)
-  return response.json()
+  return response
+}
+
+async function request(path, options) {
+  return (await send(path, options)).json()
+}
+
+/** The form every chart route reads: the image and how to turn it into a chart. */
+function chartForm({
+  file,
+  gridWidth,
+  nColors,
+  ignoreBackground = false,
+  backgroundCode = null,
+  fabricCount = null,
+}) {
+  const form = new FormData()
+  form.append('image', file)
+  form.append('grid_width', String(gridWidth))
+  form.append('n_colors', String(nColors))
+  form.append('ignore_background', ignoreBackground ? 'true' : 'false')
+  if (backgroundCode) form.append('background_code', backgroundCode)
+  if (fabricCount) form.append('fabric_count', String(fabricCount))
+  return form
 }
 
 /** Limits enforced by the server, so the interface never drifts from them. */
@@ -51,22 +74,29 @@ export function fetchLimits({ signal } = {}) {
 /**
  * Turn an image into a cross-stitch chart.
  * `backgroundCode` leaves one DMC thread unstitched; `ignoreBackground` lets the
- * server pick the color that is most common along the border.
+ * server pick the color that is most common along the border. `fabricCount`
+ * (Aida stitches per inch) only changes the size in centimeters and the skeins.
  */
-export function generateChart({
-  file,
-  gridWidth,
-  nColors,
-  ignoreBackground = false,
-  backgroundCode = null,
-  signal,
-}) {
-  const form = new FormData()
-  form.append('image', file)
-  form.append('grid_width', String(gridWidth))
-  form.append('n_colors', String(nColors))
-  form.append('ignore_background', ignoreBackground ? 'true' : 'false')
-  if (backgroundCode) form.append('background_code', backgroundCode)
+export function generateChart({ signal, ...chart }) {
+  return request('/cross-stitch/preview', { method: 'POST', body: chartForm(chart), signal })
+}
 
-  return request('/cross-stitch/preview', { method: 'POST', body: form, signal })
+const FALLBACK_FILE_NAME = 'grafico-ponto-cruz.pdf'
+
+function fileNameOf(response) {
+  const header = response.headers?.get?.('Content-Disposition') ?? ''
+  return /filename="([^"]+)"/.exec(header)?.[1] ?? FALLBACK_FILE_NAME
+}
+
+/**
+ * Ask for the chart as a printable PDF. Resolves with the file and its name.
+ * `style` is 'color' or 'bw'.
+ */
+export async function downloadPdf({ title = '', style = 'color', signal, ...chart }) {
+  const form = chartForm(chart)
+  if (title.trim()) form.append('title', title.trim())
+  form.append('style', style)
+
+  const response = await send('/cross-stitch/pdf', { method: 'POST', body: form, signal })
+  return { blob: await response.blob(), fileName: fileNameOf(response) }
 }

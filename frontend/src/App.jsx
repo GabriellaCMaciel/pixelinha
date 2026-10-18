@@ -9,7 +9,7 @@ import { useLimits } from './hooks/useLimits.js'
 import { describeError } from './services/errors.js'
 import './App.css'
 
-const DEFAULTS = { gridWidth: 100, nColors: 16, ignoreBackground: false }
+const DEFAULTS = { gridWidth: 100, nColors: 16, ignoreBackground: false, fabricCount: 14 }
 
 const within = (value, low, high) => Math.min(high, Math.max(low, value))
 
@@ -40,6 +40,9 @@ function Workspace({ limits }) {
     ...settings,
     gridWidth: within(settings.gridWidth, limits.min_grid_width, limits.max_grid_width),
     nColors: within(settings.nColors, limits.min_colors, limits.max_colors),
+    fabricCount: limits.fabric_counts.includes(settings.fabricCount)
+      ? settings.fabricCount
+      : limits.default_fabric_count,
   }
 
   const { chart, status, error, retry } = useChart({ file, ...values })
