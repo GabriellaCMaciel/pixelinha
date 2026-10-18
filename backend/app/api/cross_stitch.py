@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from app.core.config import Settings, get_settings
 from app.core.errors import api_error
-from app.modes.cross_stitch import generate_cross_stitch
+from app.modes.cross_stitch import (
+    BackgroundNotInPalette,
+    NothingToStitch,
+    generate_cross_stitch,
+)
 from app.schemas.cross_stitch import CrossStitchPreview
 from app.services.imaging import (
     ImageDecodeError,
@@ -28,9 +32,19 @@ def preview(
     image: UploadFile = File(..., description="PNG, JPEG or WEBP image."),
     grid_width: int | None = Form(None, description="Chart width in stitches."),
     n_colors: int | None = Form(None, description="Maximum number of thread colors."),
+    ignore_background: bool = Form(
+        False,
+        description="Leave the background color (the most common on the border) unstitched.",
+    ),
+    background_code: str | None = Form(
+        None,
+        description="DMC code of a chart color to leave unstitched. Implies ignore_background.",
+    ),
     settings: Settings = Depends(get_settings),
 ) -> CrossStitchPreview:
     """Turn an uploaded image into a cross-stitch chart with a DMC thread legend."""
+    background_code = (background_code or "").strip() or None
+
     if grid_width is None:
         grid_width = _within(DEFAULT_GRID_WIDTH, settings.min_grid_width, settings.max_grid_width)
     if n_colors is None:
@@ -89,5 +103,27 @@ def preview(
             max_stitches=settings.max_stitches,
         )
 
-    chart = generate_cross_stitch(pixels, grid_width, n_colors)
+    try:
+        chart = generate_cross_stitch(
+            pixels,
+            grid_width,
+            n_colors,
+            ignore_background=ignore_background,
+            background_code=background_code,
+        )
+    except BackgroundNotInPalette as error:
+        raise api_error(
+            422,
+            "background_not_in_palette",
+            f"Thread {error.code} is not one of the chart's colors.",
+            available=error.available,
+        ) from None
+    except NothingToStitch:
+        raise api_error(
+            422,
+            "nothing_to_stitch",
+            "After leaving the background unstitched there is nothing left to stitch. "
+            "Try asking for more colors, for example 2 for a single-color drawing.",
+        ) from None
+
     return CrossStitchPreview.from_chart(chart)
