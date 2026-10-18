@@ -25,7 +25,7 @@ def test_no_environment_gives_the_defaults():
 
 
 def test_environment_overrides_a_single_limit():
-    settings = load_settings({"STITCHLAB_MAX_GRID_WIDTH": "400"})
+    settings = load_settings({"PIXELINHA_MAX_GRID_WIDTH": "400"})
 
     assert settings.max_grid_width == 400
     assert settings.max_colors == 40
@@ -36,14 +36,14 @@ def test_unrelated_environment_variables_are_ignored():
 
 
 def test_non_numeric_override_is_rejected_with_a_clear_message():
-    with pytest.raises(ValueError, match="STITCHLAB_MAX_COLORS"):
-        load_settings({"STITCHLAB_MAX_COLORS": "many"})
+    with pytest.raises(ValueError, match="PIXELINHA_MAX_COLORS"):
+        load_settings({"PIXELINHA_MAX_COLORS": "many"})
 
 
 @pytest.mark.parametrize("value", ["0", "-5"])
 def test_limits_must_be_positive(value):
     with pytest.raises(ValueError):
-        load_settings({"STITCHLAB_MAX_STITCHES": value})
+        load_settings({"PIXELINHA_MAX_STITCHES": value})
 
 
 def test_minimum_cannot_exceed_maximum():

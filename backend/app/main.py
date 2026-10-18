@@ -7,7 +7,7 @@ from app.core.config import load_cors
 API_PREFIX = "/api/v1"
 
 app = FastAPI(
-    title="StitchLab API",
+    title="PixeLinha API",
     description="Turns images into embroidery charts, starting with cross-stitch.",
     version="0.1.0",
 )

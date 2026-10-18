@@ -1,1 +1,1 @@
-"""StitchLab API package."""
+"""PixeLinha API package."""
