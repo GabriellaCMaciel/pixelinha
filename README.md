@@ -243,7 +243,7 @@ stitchlab/
 - [x] Redimensionar mantendo a proporção
 - [x] Quantização com k-means em Lab
 - [x] Casamento com o DMC e fusão de duplicatas
-- [ ] Símbolos e contagem de pontos
+- [x] Símbolos e contagem de pontos
 - [ ] Rota `POST /cross-stitch/preview`
 - [ ] Testes unitários do módulo
 
