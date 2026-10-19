@@ -1,0 +1,67 @@
+.save {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.save__intro {
+  color: var(--plum);
+}
+
+.save__note {
+  color: var(--plum-soft);
+  font-size: var(--step--1);
+}
+
+.save__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.save__label {
+  font-weight: 700;
+}
+
+.save__input {
+  width: 100%;
+  padding: 0.55rem 0.9rem;
+  border: 2px solid var(--plum);
+  border-radius: var(--radius-control);
+  background: var(--paper);
+}
+
+.save__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.save__button {
+  background: var(--blossom);
+}
+
+.save__button--plain {
+  background: var(--paper);
+}
+
+.save__button:hover:not(:disabled) {
+  background: var(--honey);
+}
+
+.save__message {
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-control);
+  background: var(--paper);
+  font-weight: 600;
+}
+
+.save__message--error {
+  outline: 2px solid var(--berry);
+}
+
+.save a {
+  color: var(--berry);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
