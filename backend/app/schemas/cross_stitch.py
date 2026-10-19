@@ -9,6 +9,7 @@ from app.services.estimate import DEFAULT_FABRIC_COUNT, size_cm, skeins_needed
 class ChartColorOut(BaseModel):
     code: str
     name: str
+    name_pt: str
     hex: str
     rgb: tuple[int, int, int]
     symbol: str
@@ -27,6 +28,7 @@ class FabricOut(BaseModel):
 class ChartBackgroundOut(BaseModel):
     code: str
     name: str
+    name_pt: str
     hex: str
     rgb: tuple[int, int, int]
     count: int

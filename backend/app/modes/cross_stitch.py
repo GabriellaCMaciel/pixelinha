@@ -33,6 +33,7 @@ class ChartColor:
     rgb: tuple[int, int, int]
     symbol: str
     count: int
+    name_pt: str = ""
 
 
 @dataclass(frozen=True)
@@ -44,6 +45,7 @@ class ChartBackground:
     hex: str
     rgb: tuple[int, int, int]
     count: int
+    name_pt: str = ""
 
 
 @dataclass(frozen=True)
@@ -109,6 +111,7 @@ def generate_cross_stitch(
         background = ChartBackground(
             code=removed.code,
             name=removed.name,
+            name_pt=removed.name_pt or removed.name,
             hex=removed.hex,
             rgb=removed.rgb,
             count=covered,
@@ -121,6 +124,7 @@ def generate_cross_stitch(
         ChartColor(
             code=thread.code,
             name=thread.name,
+            name_pt=thread.name_pt or thread.name,
             hex=thread.hex,
             rgb=thread.rgb,
             symbol=symbol,
