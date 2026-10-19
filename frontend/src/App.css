@@ -78,6 +78,10 @@
   grid-area: download;
 }
 
+.workspace__save {
+  grid-area: save;
+}
+
 .workspace__legend {
   grid-area: legend;
   display: flex;
@@ -166,16 +170,17 @@
     grid-template-areas:
       'photo stage legend'
       'adjust stage legend'
-      'download stage legend';
+      'download stage legend'
+      'save stage legend';
   }
 
   .workspace__stage {
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
     min-height: 36rem;
   }
 
   .workspace__legend {
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
   }
 
   .workspace__stage .viewer {
@@ -194,11 +199,12 @@
       'photo stage'
       'adjust stage'
       'download stage'
+      'save stage'
       'legend legend';
   }
 
   .workspace__stage {
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
   }
 
   .workspace__legend {
@@ -215,6 +221,7 @@
       'stage'
       'adjust'
       'download'
+      'save'
       'legend';
   }
 

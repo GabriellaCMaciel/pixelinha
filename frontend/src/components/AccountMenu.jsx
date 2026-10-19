@@ -1,11 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { accountLabel } from '../lib/maskEmail.js'
-import AuthDialog from './AuthDialog.jsx'
 import './AccountMenu.css'
 
-/** The sign-in button, or who is signed in with a way to leave. `auth` comes from useAuth. */
+/** The sign-in button, or who is signed in with a way to reach their embroideries and leave. */
 export default function AccountMenu({ auth }) {
-  const [open, setOpen] = useState(false)
   const [error, setError] = useState('')
 
   if (!auth.enabled || auth.status === 'loading') return null
@@ -33,6 +32,9 @@ export default function AccountMenu({ auth }) {
             </>
           )}
         </p>
+        <Link className="btn account__button" to="/meus-bordados">
+          Meus bordados
+        </Link>
         <button type="button" className="btn account__button" onClick={leave}>
           Sair
         </button>
@@ -47,10 +49,9 @@ export default function AccountMenu({ auth }) {
 
   return (
     <div className="account">
-      <button type="button" className="btn account__button" onClick={() => setOpen(true)}>
+      <button type="button" className="btn account__button" onClick={auth.requestLogin}>
         Entrar ou criar conta
       </button>
-      {open && <AuthDialog auth={auth} onClose={() => setOpen(false)} />}
     </div>
   )
 }

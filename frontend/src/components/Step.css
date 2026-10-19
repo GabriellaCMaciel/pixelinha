@@ -22,6 +22,10 @@
   background: var(--coral-wash);
 }
 
+.step--leaf {
+  background: var(--leaf-wash);
+}
+
 .step__header {
   display: flex;
   align-items: center;

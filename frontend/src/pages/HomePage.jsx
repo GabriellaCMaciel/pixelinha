@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Controls from '../components/Controls.jsx'
+import SavePanel from '../components/SavePanel.jsx'
 import GridViewer from '../components/GridViewer.jsx'
 import Legend from '../components/Legend.jsx'
 import PdfExport from '../components/PdfExport.jsx'
@@ -9,6 +11,7 @@ import Uploader from '../components/Uploader.jsx'
 import { useChart } from '../hooks/useChart.js'
 import { useLimits } from '../hooks/useLimits.js'
 import { describeError } from '../services/errors.js'
+import { downloadPhoto } from '../services/library.js'
 
 const DEFAULTS = { gridWidth: 100, nColors: 16, ignoreBackground: false, fabricCount: 14 }
 
@@ -36,6 +39,42 @@ function Workspace({ limits }) {
   const [file, setFile] = useState(null)
   const [settings, setSettings] = useState(DEFAULTS)
   const [picked, setPicked] = useState(null)
+  // The saved embroidery this chart came from, when the person opened one from "Meus bordados".
+  const [saved, setSaved] = useState(null)
+  const [failedToOpen, setFailedToOpen] = useState(null)
+  const location = useLocation()
+  const wanted = location.state?.opened ?? null
+
+  useEffect(() => {
+    if (!wanted) return undefined
+
+    let active = true
+    downloadPhoto(wanted)
+      .then((photo) => {
+        if (!active) return
+        setFile(photo)
+        setSettings({ ...DEFAULTS, ...wanted.settings })
+        setPicked(null)
+        setSaved(wanted)
+      })
+      .catch(() => {
+        if (active) setFailedToOpen(wanted)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [wanted])
+
+  const openError =
+    wanted && failedToOpen === wanted
+      ? 'Não foi possível abrir esse bordado agora. Tente de novo em instantes.'
+      : ''
+
+  const chooseFile = (next) => {
+    setFile(next)
+    setSaved(null)
+  }
 
   const values = {
     ...settings,
@@ -56,7 +95,12 @@ function Workspace({ limits }) {
   return (
     <main className="workspace">
       <Step number={1} title="Escolha a foto" tone="peony" className="workspace__photo">
-        <Uploader file={file} maxBytes={limits.max_upload_bytes} onFile={setFile} />
+        <Uploader file={file} maxBytes={limits.max_upload_bytes} onFile={chooseFile} />
+        {openError && (
+          <p className="notice__text" role="alert">
+            {openError}
+          </p>
+        )}
       </Step>
 
       <section className="workspace__stage" aria-labelledby="chart-title">
@@ -115,6 +159,10 @@ function Workspace({ limits }) {
 
           <Step number={3} title="Baixe e imprima" tone="coral" className="workspace__download">
             <PdfExport file={file} settings={values} ready={status === 'ready'} />
+          </Step>
+
+          <Step number={4} title="Guarde na sua conta" tone="leaf" className="workspace__save">
+            <SavePanel file={file} settings={values} ready={status === 'ready'} opened={saved} />
           </Step>
         </>
       )}

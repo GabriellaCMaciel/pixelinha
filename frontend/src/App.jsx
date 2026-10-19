@@ -4,9 +4,10 @@ import AccountMenu from './components/AccountMenu.jsx'
 import SiteFooter from './components/SiteFooter.jsx'
 import StitchFlower from './components/StitchFlower.jsx'
 import logo from './assets/pixelinha-logo.svg'
-import { useAuth } from './hooks/useAuth.js'
+import { useAccount } from './hooks/authContext.js'
 import CookiesPage from './pages/CookiesPage.jsx'
 import HomePage from './pages/HomePage.jsx'
+import LibraryPage from './pages/LibraryPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PrivacyPage from './pages/PrivacyPage.jsx'
 import TermsPage from './pages/TermsPage.jsx'
@@ -22,7 +23,7 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  const auth = useAuth()
+  const auth = useAccount()
   const { pathname } = useLocation()
   // Only the home page has the logo as its main heading; the others have their own.
   const Title = pathname === '/' ? 'h1' : 'p'
@@ -51,6 +52,7 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/meus-bordados" element={<LibraryPage />} />
         <Route path="/termos" element={<TermsPage />} />
         <Route path="/privacidade" element={<PrivacyPage />} />
         <Route path="/cookies" element={<CookiesPage />} />
