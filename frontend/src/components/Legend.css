@@ -80,11 +80,18 @@
 }
 
 .legend__label {
-  overflow: hidden;
   color: var(--plum-soft);
   font-size: var(--step--1);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.legend__label-en {
+  color: var(--plum-soft);
+  font-size: 0.8125rem;
+  font-style: italic;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .legend__row--active .legend__label {

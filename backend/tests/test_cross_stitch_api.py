@@ -75,7 +75,7 @@ def test_each_color_describes_a_thread_with_a_symbol(client):
     body = post(client, encode(quadrants()), grid_width=20, n_colors=4).json()
 
     for color in body["colors"]:
-        assert set(color) == {"code", "name", "hex", "rgb", "symbol", "count", "skeins"}
+        assert set(color) == {"code", "name", "name_pt", "hex", "rgb", "symbol", "count", "skeins"}
         assert len(color["rgb"]) == 3
         assert len(color["symbol"]) == 1
     symbols = [color["symbol"] for color in body["colors"]]
@@ -235,7 +235,7 @@ def test_ignoring_the_background_leaves_those_cells_empty(client):
     assert body["colors"][0]["count"] == 100
     assert body["total_stitches"] == 100
     assert body["background"]["count"] == 300
-    assert set(body["background"]) == {"code", "name", "hex", "rgb", "count"}
+    assert set(body["background"]) == {"code", "name", "name_pt", "hex", "rgb", "count"}
     flat = [index for row in body["grid"] for index in row]
     assert flat.count(-1) == 300
     assert flat.count(0) == 100

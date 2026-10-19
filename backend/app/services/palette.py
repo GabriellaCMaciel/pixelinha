@@ -10,6 +10,7 @@ from app.services.color import rgb_to_lab
 from app.services.quantization import Quantized
 
 DMC_CATALOG_PATH = Path(__file__).resolve().parent.parent / "data" / "dmc.json"
+DMC_NAMES_PT_PATH = Path(__file__).resolve().parent.parent / "data" / "dmc_names_pt.json"
 
 
 @dataclass(frozen=True)
@@ -18,6 +19,7 @@ class DmcColor:
     name: str
     hex: str
     rgb: tuple[int, int, int]
+    name_pt: str = ""
 
 
 @dataclass(frozen=True)
@@ -60,10 +62,18 @@ class Catalog:
         return np.argmin(distances, axis=1)
 
 
-def load_catalog(path: Path) -> Catalog:
-    """Read a catalog from a JSON file with a `colors` list of code, name, hex, rgb."""
+def load_catalog(path: Path, names_pt_path: Path | None = None) -> Catalog:
+    """Read a catalog from a JSON file with a `colors` list of code, name, hex, rgb.
+
+    `names_pt_path` is an optional JSON object that maps a thread code to its
+    Portuguese name; threads without one keep an empty `name_pt`.
+    """
     with open(path, encoding="utf-8") as file:
         data = json.load(file)
+    names_pt: dict[str, str] = {}
+    if names_pt_path is not None:
+        with open(names_pt_path, encoding="utf-8") as file:
+            names_pt = json.load(file)
 
     colors = [
         DmcColor(
@@ -71,6 +81,7 @@ def load_catalog(path: Path) -> Catalog:
             name=str(item["name"]),
             hex=str(item["hex"]),
             rgb=(int(item["rgb"][0]), int(item["rgb"][1]), int(item["rgb"][2])),
+            name_pt=str(names_pt.get(str(item["code"]), "")),
         )
         for item in data["colors"]
     ]
@@ -80,7 +91,7 @@ def load_catalog(path: Path) -> Catalog:
 @cache
 def load_dmc_catalog() -> Catalog:
     """Load the bundled DMC catalog once and reuse it."""
-    return load_catalog(DMC_CATALOG_PATH)
+    return load_catalog(DMC_CATALOG_PATH, DMC_NAMES_PT_PATH)
 
 
 def match_palette(quantized: Quantized, catalog: Catalog) -> MatchedPalette:

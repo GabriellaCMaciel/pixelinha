@@ -3,7 +3,7 @@ import pytest
 
 from app.services.color import rgb_to_lab
 from app.services.imaging import resize_to_grid
-from app.services.palette import Catalog, DmcColor, load_dmc_catalog, match_palette
+from app.services.palette import Catalog, DmcColor, load_catalog, load_dmc_catalog, match_palette
 from app.services.quantization import Quantized, quantize_colors
 
 
@@ -164,3 +164,28 @@ def test_full_flow_with_the_real_dmc_catalog():
     codes = [c.code for c in result.colors]
     assert len(set(codes)) == len(codes)
     assert set(np.unique(result.labels)) == set(range(len(result.colors)))
+
+
+def test_every_bundled_thread_has_a_portuguese_name():
+    catalog = load_dmc_catalog()
+
+    assert all(color.name_pt for color in catalog.colors)
+
+
+def test_portuguese_names_follow_the_english_shade():
+    by_code = {color.code: color for color in load_dmc_catalog().colors}
+
+    assert by_code["3713"].name == "Salmon Very Light"
+    assert by_code["3713"].name_pt == "Salmão Muito Claro"
+    assert by_code["310"].name_pt == "Preto"
+    assert by_code["Ecru"].name_pt == "Cru"
+
+
+def test_threads_without_a_portuguese_name_keep_it_empty(tmp_path):
+    path = tmp_path / "catalog.json"
+    path.write_text(
+        '{"colors": [{"code": "1", "name": "One", "hex": "#000000", "rgb": [0, 0, 0]}]}',
+        encoding="utf-8",
+    )
+
+    assert load_catalog(path).colors[0].name_pt == ""

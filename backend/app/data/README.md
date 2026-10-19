@@ -10,3 +10,10 @@
 - **Trademark:** DMC is a trademark of its owner. This project is not affiliated with or endorsed by DMC.
 
 Checked on import: 489 colors, no duplicate codes, RGB values in range and every `hex` consistent with its `rgb`.
+
+## `dmc_names_pt.json`: Portuguese names
+
+A Brazilian Portuguese name for each of the 489 DMC codes (for example `"3713": "Salmão Muito Claro"`), shown next to the English name in the legend and the PDF.
+
+- **Made by this project**, not part of the upstream catalog. Names are built from a table of base colors and a table of shades in `backend/scripts/build_dmc_names_pt.py`; edit the tables there and run the script to regenerate the file.
+- Two threads in the English catalog share a name (DMC 158 and 791), so their Portuguese names match too; the code tells them apart.
