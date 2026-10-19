@@ -77,6 +77,69 @@
   font-size: var(--step--1);
 }
 
+.auth__error {
+  color: var(--berry);
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+.auth__input[aria-invalid='true'] {
+  border-color: var(--berry);
+  background: var(--paper);
+  box-shadow: 0 0 0 2px var(--berry);
+}
+
+.auth__rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: -0.35rem 0 0;
+  padding: 0;
+  color: var(--plum-soft);
+  font-size: var(--step--1);
+  list-style: none;
+}
+
+.auth__rule--ok {
+  color: var(--plum);
+  font-weight: 700;
+}
+
+.auth__consent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.auth__check--top {
+  align-items: flex-start;
+  min-height: 0;
+  line-height: 1.4;
+}
+
+.auth__check--top input {
+  flex: none;
+  margin-top: 0.1rem;
+}
+
+.auth a,
+.legal a {
+  color: var(--berry);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+.auth a:hover {
+  color: var(--plum);
+}
+
+.auth__legal {
+  margin-top: 0.9rem;
+  color: var(--plum-soft);
+  font-size: var(--step--1);
+  text-align: center;
+}
+
 .auth__check {
   display: flex;
   align-items: center;
