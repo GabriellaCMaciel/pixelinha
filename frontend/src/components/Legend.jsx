@@ -55,7 +55,12 @@ export default function Legend({ chart, highlight = null, onHighlight }) {
                 </span>
                 <span className="legend__name">
                   <span className="legend__code">DMC {color.code}</span>
-                  <span className="legend__label">{color.name}</span>
+                  <span className="legend__label">{color.name_pt ?? color.name}</span>
+                  {color.name_pt && color.name_pt !== color.name && (
+                    <span className="legend__label-en" lang="en">
+                      {color.name}
+                    </span>
+                  )}
                 </span>
                 <span className="legend__count">
                   {number.format(color.count)}
@@ -80,7 +85,7 @@ export default function Legend({ chart, highlight = null, onHighlight }) {
             style={{ backgroundColor: background.hex }}
             aria-hidden="true"
           />
-          Fundo sem ponto: DMC {background.code} ({background.name})
+          Fundo sem ponto: DMC {background.code} ({background.name_pt ?? background.name})
         </p>
       )}
     </section>

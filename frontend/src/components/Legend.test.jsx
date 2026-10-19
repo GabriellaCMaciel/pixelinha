@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 import Legend from './Legend.jsx'
 
 const colors = [
-  { code: '310', name: 'Black', hex: '#000000', rgb: [0, 0, 0], symbol: '●', count: 1500, skeins: 1 },
-  { code: '666', name: 'Bright Red', hex: '#e31d42', rgb: [227, 29, 66], symbol: '■', count: 99, skeins: 1 },
+  { code: '310', name: 'Black', name_pt: 'Preto', hex: '#000000', rgb: [0, 0, 0], symbol: '●', count: 1500, skeins: 1 },
+  { code: '666', name: 'Bright Red', name_pt: 'Vermelho Vivo', hex: '#e31d42', rgb: [227, 29, 66], symbol: '■', count: 99, skeins: 1 },
 ]
 
 const fabric = { count: 14, width_cm: 7.3, height_cm: 7.3 }
@@ -16,10 +16,25 @@ describe('Legend', () => {
     render(<Legend chart={chart} />)
 
     expect(screen.getByText('DMC 310')).toBeInTheDocument()
+    expect(screen.getByText('Preto')).toBeInTheDocument()
     expect(screen.getByText('Black')).toBeInTheDocument()
     expect(screen.getByText('1.500')).toBeInTheDocument()
     expect(screen.getByText('DMC 666')).toBeInTheDocument()
     expect(screen.getByText('99')).toBeInTheDocument()
+  })
+
+  it('shows the Portuguese name first and the English one beside it', () => {
+    render(<Legend chart={chart} />)
+
+    expect(screen.getByText('Vermelho Vivo')).toBeInTheDocument()
+    expect(screen.getByText('Bright Red')).toHaveAttribute('lang', 'en')
+  })
+
+  it('shows only one name when a thread has no Portuguese one', () => {
+    const plain = { ...chart, colors: [{ ...colors[0], name_pt: undefined }] }
+    render(<Legend chart={plain} />)
+
+    expect(screen.getAllByText('Black')).toHaveLength(1)
   })
 
   it('shows the totals', () => {
@@ -78,10 +93,10 @@ describe('Legend', () => {
   })
 
   it('mentions the unstitched background', () => {
-    const withBackground = { ...chart, background: { code: 'B5200', name: 'Snow White', hex: '#ffffff' } }
+    const withBackground = { ...chart, background: { code: 'B5200', name: 'Snow White', name_pt: 'Branco Neve', hex: '#ffffff' } }
     render(<Legend chart={withBackground} />)
 
-    expect(screen.getByText(/Fundo sem ponto: DMC B5200 \(Snow White\)/)).toBeInTheDocument()
+    expect(screen.getByText(/Fundo sem ponto: DMC B5200 \(Branco Neve\)/)).toBeInTheDocument()
   })
 
   it('has no background note when the whole image is stitched', () => {

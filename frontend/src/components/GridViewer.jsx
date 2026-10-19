@@ -17,7 +17,7 @@ function describeCell(chart, hover) {
   const index = chart.grid[hover.row][hover.col]
   if (index < 0) return `${place}: sem ponto`
   const color = chart.colors[index]
-  return `${place}: ${color.symbol} ${color.code} ${color.name}`
+  return `${place}: ${color.symbol} ${color.code} ${color.name_pt ?? color.name}`
 }
 
 /**
