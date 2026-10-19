@@ -13,6 +13,14 @@
   gap: 1.1rem;
 }
 
+.page__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+}
+
 .page__brand {
   display: flex;
   align-items: center;
