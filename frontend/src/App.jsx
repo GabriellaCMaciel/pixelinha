@@ -157,7 +157,7 @@ export default function App() {
 
       {status === 'loading' && (
         <Notice waiting>
-          Conectando ao servidor… Na primeira visita do dia isso pode levar cerca de 1 minuto.
+          Conectando ao servidor…
         </Notice>
       )}
 
