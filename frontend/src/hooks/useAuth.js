@@ -34,8 +34,13 @@ export function useAuth() {
     if (error) throw error
   }, [])
 
-  const signUp = useCallback(async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({ email, password })
+  const signUp = useCallback(async (email, password, name = '') => {
+    const displayName = name.trim()
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: displayName ? { data: { display_name: displayName } } : undefined,
+    })
     if (error) throw error
     // With "Confirm email" on, Supabase answers without a session until the link is opened.
     return { needsConfirmation: !data.session }
