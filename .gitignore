@@ -16,6 +16,7 @@ dist/
 .env.*
 !.env.example
 !.env.production
+!.env.development
 
 # OS / editor
 .DS_Store

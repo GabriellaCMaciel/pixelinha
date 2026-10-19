@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AccountMenu from './components/AccountMenu.jsx'
 import Controls from './components/Controls.jsx'
 import GridViewer from './components/GridViewer.jsx'
 import Legend from './components/Legend.jsx'
@@ -7,6 +8,7 @@ import Step from './components/Step.jsx'
 import StitchFlower from './components/StitchFlower.jsx'
 import Uploader from './components/Uploader.jsx'
 import logo from './assets/pixelinha-logo.svg'
+import { useAuth } from './hooks/useAuth.js'
 import { useChart } from './hooks/useChart.js'
 import { useLimits } from './hooks/useLimits.js'
 import { describeError } from './services/errors.js'
@@ -136,19 +138,23 @@ function Workspace({ limits }) {
 
 export default function App() {
   const { limits, status, error, retry } = useLimits()
+  const auth = useAuth()
 
   return (
     <div className="page">
       <header className="page__header">
-        <div className="page__brand">
-          <StitchFlower size={76} />
-          <div>
-            <h1 className="page__title">
-              <span className="visually-hidden">PixeLinha</span>
-              <img className="page__logo" src={logo} alt="" aria-hidden="true" />
-            </h1>
-            <p className="page__tagline">Transforme qualquer imagem em gráfico de ponto cruz.</p>
+        <div className="page__bar">
+          <div className="page__brand">
+            <StitchFlower size={76} />
+            <div>
+              <h1 className="page__title">
+                <span className="visually-hidden">PixeLinha</span>
+                <img className="page__logo" src={logo} alt="" aria-hidden="true" />
+              </h1>
+              <p className="page__tagline">Transforme qualquer imagem em gráfico de ponto cruz.</p>
+            </div>
           </div>
+          <AccountMenu auth={auth} />
         </div>
         <hr className="stitch-rule" />
       </header>
