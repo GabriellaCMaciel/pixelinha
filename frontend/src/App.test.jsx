@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { ApiError } from './services/api.js'
 
@@ -65,14 +66,14 @@ beforeEach(() => {
 
 describe('App', () => {
   it('shows the name of the product', async () => {
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
 
     expect(screen.getByRole('heading', { name: 'PixeLinha' })).toBeInTheDocument()
     await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' })
   })
 
   it('tells the person it is connecting to the server', async () => {
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
 
     expect(screen.getByRole('status')).toHaveTextContent('Conectando ao servidor')
     await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' })
@@ -81,7 +82,7 @@ describe('App', () => {
   it('offers a retry when the server cannot be reached', async () => {
     const user = userEvent.setup()
     fetchLimits.mockRejectedValueOnce(new ApiError({ code: 'network' }))
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível falar com o servidor')
 
@@ -91,7 +92,7 @@ describe('App', () => {
   })
 
   it('invites the person to pick an image before there is a chart', async () => {
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
 
     expect(await screen.findByRole('heading', { name: 'Escolha a foto' })).toBeInTheDocument()
     expect(screen.getByText('Escolha uma foto no passo 1 e o gráfico aparece aqui.')).toBeInTheDocument()
@@ -100,7 +101,7 @@ describe('App', () => {
 
   it('shows only the first step until there is a photo', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await screen.findByRole('heading', { name: 'Escolha a foto' })
 
     expect(screen.queryByRole('heading', { name: 'Ajuste do seu jeito' })).not.toBeInTheDocument()
@@ -114,7 +115,7 @@ describe('App', () => {
 
   it('makes a chart from the example image', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
 
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
 
@@ -125,7 +126,7 @@ describe('App', () => {
 
   it('asks again with the new setting after a slider stops moving', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
     await screen.findByRole('img')
 
@@ -139,7 +140,7 @@ describe('App', () => {
 
   it('asks again with the width of the chosen size', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
     await screen.findByRole('img')
 
@@ -151,7 +152,7 @@ describe('App', () => {
 
   it('asks again with the chosen fabric', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
     await screen.findByRole('img')
 
@@ -164,7 +165,7 @@ describe('App', () => {
 
   it('sends the unstitched background option', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
     await screen.findByRole('img')
 
@@ -176,7 +177,7 @@ describe('App', () => {
 
   it('explains an error in Portuguese and keeps the chart on screen', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
     await screen.findByRole('img')
 
@@ -192,7 +193,7 @@ describe('App', () => {
   it('keeps the PDF button locked while the chart is loading', async () => {
     const user = userEvent.setup()
     generateChart.mockReturnValue(new Promise(() => {}))
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
 
     expect(await screen.findByRole('button', { name: 'Baixar PDF' })).toBeDisabled()
@@ -200,7 +201,7 @@ describe('App', () => {
 
   it('downloads the PDF of the chart on screen', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
     await screen.findByRole('img')
 
@@ -220,7 +221,7 @@ describe('App', () => {
 
   it('highlights a thread from the legend', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App />, { wrapper: MemoryRouter })
     await user.click(await screen.findByRole('button', { name: 'Testar com uma imagem de exemplo' }))
 
     const row = await screen.findByRole('button', { name: /DMC 310/ })

@@ -1,0 +1,32 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-top: 3rem;
+  padding-bottom: 1.5rem;
+}
+
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}
+
+.footer__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--plum);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+.footer__links a:hover {
+  color: var(--berry);
+}
+
+.footer__note {
+  max-width: 44rem;
+  color: var(--plum-soft);
+  font-size: var(--step--1);
+}

@@ -1,0 +1,101 @@
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
+.legal__back {
+  align-self: flex-start;
+  padding: 0.4rem 0;
+  font-weight: 700;
+}
+
+.legal__sheet {
+  padding: 2rem 1.75rem 1.75rem;
+  border-radius: var(--radius-patch);
+  outline: 2px dashed rgba(166, 64, 111, 0.55);
+  outline-offset: -10px;
+  background: var(--paper);
+  line-height: 1.65;
+}
+
+.legal__title {
+  font-size: var(--step-3);
+}
+
+.legal__updated {
+  margin-top: 0.4rem;
+  color: var(--plum-soft);
+  font-size: var(--step--1);
+}
+
+.legal__intro {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-control);
+  background: var(--peony-wash);
+  font-weight: 500;
+}
+
+.legal__section {
+  margin-top: 1.75rem;
+}
+
+.legal__section h2 {
+  margin-bottom: 0.5rem;
+  font-size: var(--step-2);
+}
+
+.legal__section p + p,
+.legal__section p + ul,
+.legal__section ul + p {
+  margin-top: 0.75rem;
+}
+
+.legal__section ul {
+  padding-left: 1.3rem;
+}
+
+.legal__section li + li {
+  margin-top: 0.35rem;
+}
+
+.legal__table {
+  width: 100%;
+  margin-top: 0.75rem;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+}
+
+.legal__table th,
+.legal__table td {
+  padding: 0.55rem 0.6rem;
+  border: 1px solid rgba(166, 64, 111, 0.45);
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal__table th {
+  background: var(--honey-wash);
+}
+
+.legal__table-wrap {
+  overflow-x: auto;
+}
+
+.legal__others {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px dashed rgba(166, 64, 111, 0.45);
+}
+
+@media (max-width: 40rem) {
+  .legal__sheet {
+    padding: 1.5rem 1.1rem 1.25rem;
+  }
+}
