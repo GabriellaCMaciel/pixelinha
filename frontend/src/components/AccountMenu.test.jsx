@@ -32,7 +32,8 @@ describe('AccountMenu', () => {
     const signOut = vi.fn().mockResolvedValue(undefined)
     render(<AccountMenu auth={{ ...base, user: { email: 'ana@exemplo.com' }, signOut }} />)
 
-    expect(screen.getByText('ana@exemplo.com')).toBeInTheDocument()
+    expect(screen.queryByText('ana@exemplo.com')).not.toBeInTheDocument()
+    expect(screen.getByText('an•••@e•••.com')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Sair' }))
 
     expect(signOut).toHaveBeenCalled()
@@ -46,5 +47,15 @@ describe('AccountMenu', () => {
     await user.click(screen.getByRole('button', { name: 'Sair' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível sair')
+  })
+})
+
+describe('AccountMenu greeting', () => {
+  it('greets by the chosen name and shows no e-mail at all', () => {
+    const user = { email: 'ana@exemplo.com', user_metadata: { display_name: 'Ana' } }
+    const { container } = render(<AccountMenu auth={{ ...base, user }} />)
+
+    expect(screen.getByText('Olá, Ana!')).toBeInTheDocument()
+    expect(container).not.toHaveTextContent('exemplo')
   })
 })

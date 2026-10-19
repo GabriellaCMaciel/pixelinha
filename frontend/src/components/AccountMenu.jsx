@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { accountLabel } from '../lib/maskEmail.js'
 import AuthDialog from './AuthDialog.jsx'
 import './AccountMenu.css'
 
@@ -19,11 +20,18 @@ export default function AccountMenu({ auth }) {
   }
 
   if (auth.user) {
+    const { name, masked } = accountLabel(auth.user)
     return (
       <div className="account">
         <p className="account__who">
-          <span className="account__hello">Você entrou como</span>
-          <span className="account__email">{auth.user.email}</span>
+          {name ? (
+            <span className="account__email">Olá, {name}!</span>
+          ) : (
+            <>
+              <span className="account__hello">Você entrou como</span>
+              <span className="account__email">{masked}</span>
+            </>
+          )}
         </p>
         <button type="button" className="btn account__button" onClick={leave}>
           Sair
