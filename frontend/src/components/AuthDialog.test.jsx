@@ -14,7 +14,19 @@ function setup(overrides = {}) {
   return { auth, onClose, user: userEvent.setup() }
 }
 
-describe('AuthDialog', () => {
+async function openSignUp(user) {
+  await user.click(screen.getByRole('button', { name: 'Criar conta' }))
+}
+
+async function fillSignUp(user, { email = 'ana@exemplo.com', password = 'bordado2026', confirmation = password } = {}) {
+  await user.type(screen.getByLabelText('E-mail'), email)
+  await user.type(screen.getByLabelText('Senha'), password)
+  await user.type(screen.getByLabelText('Repita a senha'), confirmation)
+}
+
+const submitButton = () => screen.getAllByRole('button', { name: 'Criar conta' }).at(-1)
+
+describe('AuthDialog signing in', () => {
   it('opens on signing in with the e-mail field focused', () => {
     setup()
 
@@ -22,10 +34,10 @@ describe('AuthDialog', () => {
     expect(screen.getByLabelText('E-mail')).toHaveFocus()
   })
 
-  it('signs in with what was typed and closes', async () => {
+  it('signs in with a clean, lowercase e-mail and closes', async () => {
     const { auth, onClose, user } = setup()
 
-    await user.type(screen.getByLabelText('E-mail'), ' ana@exemplo.com ')
+    await user.type(screen.getByLabelText('E-mail'), ' Ana@Exemplo.com ')
     await user.type(screen.getByLabelText('Senha'), 'segredo1')
     await user.click(screen.getByRole('button', { name: 'Entrar' }))
 
@@ -33,7 +45,30 @@ describe('AuthDialog', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled())
   })
 
-  it('explains the problem in Portuguese and stays open when signing in fails', async () => {
+  it('does not ask a returning person for the new-password rules', async () => {
+    const { auth, user } = setup()
+
+    await user.type(screen.getByLabelText('E-mail'), 'ana@exemplo.com')
+    await user.type(screen.getByLabelText('Senha'), 'abc')
+    await user.click(screen.getByRole('button', { name: 'Entrar' }))
+
+    expect(auth.signIn).toHaveBeenCalledWith('ana@exemplo.com', 'abc')
+  })
+
+  it('explains an invalid e-mail and an empty password without calling the server', async () => {
+    const { auth, user } = setup()
+
+    await user.type(screen.getByLabelText('E-mail'), 'ana@')
+    await user.click(screen.getByRole('button', { name: 'Entrar' }))
+
+    expect(screen.getByLabelText('E-mail')).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByText(/não parece válido/)).toBeInTheDocument()
+    expect(screen.getByText('Digite a sua senha.')).toBeInTheDocument()
+    expect(screen.getByLabelText('E-mail')).toHaveFocus()
+    expect(auth.signIn).not.toHaveBeenCalled()
+  })
+
+  it('explains the problem in Portuguese and stays open when the server refuses', async () => {
     const { onClose, user } = setup({
       signIn: vi.fn().mockRejectedValue({ code: 'invalid_credentials' }),
     })
@@ -46,34 +81,13 @@ describe('AuthDialog', () => {
     expect(onClose).not.toHaveBeenCalled()
   })
 
-  it('switches to creating an account and asks for at least 6 characters', async () => {
-    const { auth, onClose, user } = setup()
+  it('mentions the terms and privacy policy with links that open in a new tab', () => {
+    setup()
 
-    await user.click(screen.getByRole('button', { name: 'Criar conta' }))
-    expect(screen.getByRole('dialog', { name: 'Criar sua conta' })).toBeInTheDocument()
-    expect(screen.getByText('Use pelo menos 6 caracteres.')).toBeInTheDocument()
-    expect(screen.getByLabelText('Senha')).toHaveAttribute('minlength', '6')
-
-    await user.type(screen.getByLabelText('E-mail'), 'ana@exemplo.com')
-    await user.type(screen.getByLabelText('Senha'), 'segredo1')
-    await user.click(screen.getAllByRole('button', { name: 'Criar conta' }).at(-1))
-
-    expect(auth.signUp).toHaveBeenCalledWith('ana@exemplo.com', 'segredo1')
-    await waitFor(() => expect(onClose).toHaveBeenCalled())
-  })
-
-  it('tells the person to check the e-mail when confirmation is needed', async () => {
-    const { onClose, user } = setup({
-      signUp: vi.fn().mockResolvedValue({ needsConfirmation: true }),
-    })
-
-    await user.click(screen.getByRole('button', { name: 'Criar conta' }))
-    await user.type(screen.getByLabelText('E-mail'), 'ana@exemplo.com')
-    await user.type(screen.getByLabelText('Senha'), 'segredo1')
-    await user.click(screen.getAllByRole('button', { name: 'Criar conta' }).at(-1))
-
-    expect(await screen.findByRole('status')).toHaveTextContent('Enviamos uma mensagem')
-    expect(onClose).not.toHaveBeenCalled()
+    const terms = screen.getByRole('link', { name: 'Termos de Uso' })
+    expect(terms).toHaveAttribute('href', '/termos')
+    expect(terms).toHaveAttribute('target', '_blank')
+    expect(screen.getByRole('link', { name: 'Política de Privacidade' })).toHaveAttribute('href', '/privacidade')
   })
 
   it('shows and hides the password', async () => {
@@ -92,5 +106,100 @@ describe('AuthDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Fechar' }))
 
     expect(onClose).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('AuthDialog creating an account', () => {
+  it('shows the password rules, the repeat field, the name and the three policies', async () => {
+    const { user } = setup()
+    await openSignUp(user)
+
+    expect(screen.getByRole('dialog', { name: 'Criar sua conta' })).toBeInTheDocument()
+    expect(screen.getByLabelText(/Como podemos te chamar/)).toBeInTheDocument()
+    expect(screen.getByLabelText('Repita a senha')).toBeInTheDocument()
+    expect(screen.getByRole('list', { name: 'O que a senha precisa ter' })).toBeInTheDocument()
+    for (const name of ['Termos de Uso', 'Política de Privacidade', 'Política de Cookies']) {
+      expect(screen.getByRole('link', { name })).toBeInTheDocument()
+    }
+  })
+
+  it('ticks each password rule as it is met', async () => {
+    const { user } = setup()
+    await openSignUp(user)
+    const rules = screen.getByRole('list', { name: 'O que a senha precisa ter' })
+
+    expect(rules).toHaveTextContent('Pelo menos 8 caracteres (falta)')
+    await user.type(screen.getByLabelText('Senha'), 'bordado1')
+
+    expect(rules).toHaveTextContent('Pelo menos 8 caracteres (feito)')
+    expect(rules).toHaveTextContent('Uma letra (feito)')
+    expect(rules).toHaveTextContent('Um número (feito)')
+  })
+
+  it('creates the account with the name and the accepted terms', async () => {
+    const { auth, onClose, user } = setup()
+    await openSignUp(user)
+
+    await user.type(screen.getByLabelText(/Como podemos te chamar/), 'Ana')
+    await fillSignUp(user)
+    await user.click(screen.getByRole('checkbox', { name: /Li e concordo/ }))
+    await user.click(submitButton())
+
+    expect(auth.signUp).toHaveBeenCalledWith(
+      'ana@exemplo.com',
+      'bordado2026',
+      'Ana',
+      expect.objectContaining({ termsVersion: expect.any(String), termsAcceptedAt: expect.any(String) }),
+    )
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
+  })
+
+  it('does not create the account until the terms are accepted', async () => {
+    const { auth, user } = setup()
+    await openSignUp(user)
+
+    await fillSignUp(user)
+    await user.click(submitButton())
+
+    expect(screen.getByText(/marque que você leu e concorda/)).toBeInTheDocument()
+    expect(auth.signUp).not.toHaveBeenCalled()
+  })
+
+  it('rejects a weak password and tells why', async () => {
+    const { auth, user } = setup()
+    await openSignUp(user)
+
+    await fillSignUp(user, { password: 'curta1' })
+    await user.click(screen.getByRole('checkbox', { name: /Li e concordo/ }))
+    await user.click(submitButton())
+
+    expect(screen.getByText(/pelo menos 8 caracteres, com letras e números/)).toBeInTheDocument()
+    expect(auth.signUp).not.toHaveBeenCalled()
+  })
+
+  it('rejects a password that was typed differently the second time', async () => {
+    const { auth, user } = setup()
+    await openSignUp(user)
+
+    await fillSignUp(user, { password: 'bordado2026', confirmation: 'bordado2025' })
+    await user.click(screen.getByRole('checkbox', { name: /Li e concordo/ }))
+    await user.click(submitButton())
+
+    expect(screen.getByText(/As senhas não são iguais/)).toBeInTheDocument()
+    expect(auth.signUp).not.toHaveBeenCalled()
+  })
+
+  it('tells the person to check the e-mail when confirmation is needed', async () => {
+    const { onClose, user } = setup({
+      signUp: vi.fn().mockResolvedValue({ needsConfirmation: true }),
+    })
+    await openSignUp(user)
+
+    await fillSignUp(user)
+    await user.click(screen.getByRole('checkbox', { name: /Li e concordo/ }))
+    await user.click(submitButton())
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Enviamos uma mensagem')
+    expect(onClose).not.toHaveBeenCalled()
   })
 })

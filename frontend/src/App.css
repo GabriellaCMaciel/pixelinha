@@ -37,6 +37,12 @@
   height: auto;
 }
 
+.page__home {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+}
+
 .page__tagline {
   margin-top: 0.15rem;
   color: var(--plum-soft);
