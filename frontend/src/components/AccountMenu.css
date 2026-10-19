@@ -25,6 +25,7 @@
 
 .account__button {
   min-height: 2.75rem;
+  text-decoration: none;
   padding: 0.4rem 1.1rem;
   background: var(--paper);
 }
