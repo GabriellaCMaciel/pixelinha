@@ -137,6 +137,13 @@ def _decimal(value: float) -> str:
     return f"{value:.1f}".replace(".", ",")
 
 
+def _both_names(thread) -> str:
+    """Portuguese name with the English one beside it, when they differ."""
+    if thread.name_pt and thread.name_pt != thread.name:
+        return f"{thread.name_pt} / {thread.name}"
+    return thread.name
+
+
 def _fit(text: str, font: str, size: float, max_width: float) -> str:
     """Shorten text with an ellipsis so it fits in max_width points."""
     if pdfmetrics.stringWidth(text, font, size) <= max_width:
@@ -344,7 +351,7 @@ class _Document:
         ]
         if chart.background is not None:
             facts.append(
-                ("Fundo sem ponto", f"DMC {chart.background.code} ({chart.background.name})")
+                ("Fundo sem ponto", f"DMC {chart.background.code} ({_both_names(chart.background)})")
             )
 
         label_x = MARGIN
@@ -450,9 +457,23 @@ class _Document:
                 baseline = row_bottom + LEGEND_ROW / 2 - 3.2
                 c.setFont(FONT_BOLD, 10)
                 c.drawString(columns["code"], baseline, color.code)
-                c.setFont(FONT, 9.5)
                 name_width = columns["stitches"] - 22 * mm - columns["name"]
-                c.drawString(columns["name"], baseline, _fit(color.name, FONT, 9.5, name_width))
+                c.setFont(FONT, 9.5)
+                c.setFillColorRGB(*INK)
+                c.drawString(
+                    columns["name"],
+                    baseline + 1.5 * mm,
+                    _fit(color.name_pt or color.name, FONT, 9.5, name_width),
+                )
+                if color.name_pt and color.name_pt != color.name:
+                    c.setFont(FONT, 7.5)
+                    c.setFillColorRGB(*SOFT)
+                    c.drawString(
+                        columns["name"],
+                        baseline - 2.1 * mm,
+                        _fit(color.name, FONT, 7.5, name_width),
+                    )
+                    c.setFillColorRGB(*INK)
                 c.drawRightString(columns["stitches"], baseline, _number(color.count))
                 c.drawRightString(
                     columns["skeins"],
