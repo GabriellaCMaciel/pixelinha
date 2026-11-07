@@ -2,7 +2,9 @@
 
 > Aplicação web que transforma uma imagem em gráficos de bordado, começando pelo **ponto cruz**.
 
-**Status:** 📝 Planejamento · **Versão do documento:** 0.1
+**Status:** ✅ MVP no ar · **Versão do documento:** 0.1
+
+🔗 **Acesse:** [pixelinha.vercel.app](https://pixelinha.vercel.app) (no primeiro acesso, a API gratuita pode levar cerca de 1 minuto para acordar)
 
 ---
 
